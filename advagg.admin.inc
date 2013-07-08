@@ -41,6 +41,7 @@ function advagg_admin_settings_form($form, $form_state) {
     '#disabled' => module_exists('httprl') ? FALSE : TRUE,
   );
   $options = array(
+    -1 => t('Development ~ 100ms'),
     0 => t('Disabled ~ 70ms'),
     1 => t('Normal ~ 10ms'),
     3 => t('Aggressive ~ 4ms'),
@@ -50,7 +51,7 @@ function advagg_admin_settings_form($form, $form_state) {
     '#title' => t('AdvAgg Cache Settings'),
     '#default_value' => variable_get('advagg_cache_level', ADVAGG_CACHE_LEVEL),
     '#options' => $options,
-    '#description' => t('Disabled is useful for testing hook_alters for CSS/JS. Normal is should be fine for all use cases. Aggressive might break depending on how various hook_alter for CSS/JS are implemented. As a reference, core takes about 7 ms to run.'),
+    '#description' => t('Development will scan all files for a change on every page load. Disabled is useful for testing hook_alters for CSS/JS. Normal is should be fine for all use cases. Aggressive might break depending on how various hook_alter for CSS/JS are implemented. As a reference, core takes about 7 ms to run.'),
   );
 
   $form['css'] = array(

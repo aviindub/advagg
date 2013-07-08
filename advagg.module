@@ -85,6 +85,18 @@ function advagg_hook_info() {
 }
 
 /**
+ * Implements hook_module_implements_alter().
+ */
+function advagg_module_implements_alter(&$implementations, $hook) {
+  // Move advagg to the top.
+  if ($hook === 'theme_registry_alter' && array_key_exists('advagg', $implementations)) {
+    $item = array('advagg' => $implementations['advagg']);
+    unset($implementations['advagg']);
+    $implementations = array_merge($item, $implementations);
+  }
+}
+
+/**
  * Implements hook_system_info_alter().
  */
 function advagg_system_info_alter(&$info, $file, $type) {
@@ -557,6 +569,25 @@ function _advagg_aggregate_js(&$js_groups) {
 function _advagg_process_html(&$variables) {
   if (!advagg_enabled()) {
     return template_process_html($variables);
+  }
+
+  // Scan for changes to any CSS/JS files.
+  if (variable_get('advagg_cache_level', ADVAGG_CACHE_LEVEL) < 0) {
+    module_load_include('inc', 'advagg', 'advagg.cache');
+    $flushed = advagg_push_new_changes();
+
+    // Report back the results.
+    if (!empty($flushed)) {
+      foreach ($flushed as $filename => $data) {
+        $ext = pathinfo($filename, PATHINFO_EXTENSION);
+        drupal_set_message(t('The file %filename has changed. %db_usage aggregates are using this file. %db_count db cache entries and all %type full cache entries have been flushed from the cache bins.', array(
+          '%filename' => $filename,
+          '%db_usage' => count($data[0]),
+          '%db_count' => count($data[1]),
+          '%type' => $ext,
+        )));
+      }
+    }
   }
 
   // Get default javascript.
