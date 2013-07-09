@@ -861,6 +861,13 @@ function advagg_get_js_scopes($javascript) {
       $scopes[$item['scope']] = TRUE;
     }
   }
+
+  // Default to header if nothing found.
+  if (empty($scopes)) {
+    $scopes['header'] = TRUE;
+  }
+
+  // Return the scopes.
   return $scopes;
 }
 
