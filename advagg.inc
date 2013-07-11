@@ -665,10 +665,32 @@ function advagg_create_aggregate_files($plans) {
  *   Name of the stylesheet to be processed.
  * @param $optimize
  *   Defines if CSS contents should be compressed or not.
+ * @param $aggregate_settings
+ *   array of settings.
  * @return
  *   Contents of the stylesheet, including any resolved @import commands.
  */
-function advagg_load_css_stylesheet($file, $optimize) {
+function advagg_load_css_stylesheet($file, $optimize, $aggregate_settings = NULL) {
+  // Use current $aggregate_settings if none was passed in.
+  if (is_null($aggregate_settings)) {
+    $aggregate_settings = advagg_current_hooks_hash_array();
+  }
+
+  // Set http/https context.
+  $orginal_base_root = $GLOBALS['base_root'];
+  $orginal_base_url = $GLOBALS['base_url'];
+  $orginal_is_https = $GLOBALS['is_https'];
+  $GLOBALS['is_https'] = $aggregate_settings['variables']['is_https'];
+  if ($aggregate_settings['variables']['is_https']) {
+    $GLOBALS['base_root'] = str_replace('http://', 'https://', $GLOBALS['base_root']);
+    $GLOBALS['base_url'] = str_replace('http://', 'https://', $GLOBALS['base_url']);
+  }
+  else {
+    $GLOBALS['base_root'] = str_replace('https://', 'http://', $GLOBALS['base_root']);
+    $GLOBALS['base_url'] = str_replace('https://', 'http://', $GLOBALS['base_url']);
+  }
+
+  // Get the stylesheets contents.
   $contents = drupal_load_stylesheet($file, $optimize);
 
   // Build the base URL of this CSS file: start with the full URL.
@@ -685,5 +707,11 @@ function advagg_load_css_stylesheet($file, $optimize) {
   // Anchor all paths in the CSS with its base URL, ignoring external and absolute paths.
   $contents = preg_replace_callback('/url\(\s*[\'"]?(?![a-z]+:|\/+)([^\'")]+)[\'"]?\s*\)/i', '_drupal_build_css_path', $contents);
 
+  // Set the http/https context back.
+  $GLOBALS['base_root'] = $orginal_base_root;
+  $GLOBALS['base_url'] = $orginal_base_url;
+  $GLOBALS['is_https'] = $orginal_is_https;
+
+  // Return the stylesheets contents.
   return $contents;
 }

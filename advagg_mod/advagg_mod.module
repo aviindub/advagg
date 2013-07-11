@@ -343,7 +343,7 @@ function advagg_mod_inline_css(&$css) {
 
     $file = $values['data'];
     if (file_exists($file)) {
-      $contents = advagg_load_css_stylesheet($file, $optimize);
+      $contents = advagg_load_css_stylesheet($file, $optimize, $aggregate_settings);
 
       // Allow other modules to modify this files contents.
       // Call hook_advagg_get_css_file_contents_alter().
