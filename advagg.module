@@ -535,9 +535,13 @@ function _advagg_aggregate_css(&$css_groups) {
       // the group's data property to the file path of the aggregate file.
       case 'file':
         if ($group['preprocess'] && $preprocess_css) {
-          $files_to_aggregate[$gap_counter][] = $group;
+          $files_to_aggregate[$gap_counter][$key] = $group;
+        }
+        else {
+          $gap_counter++;
         }
         break;
+
       // Aggregate all inline CSS content into the group's data property.
       case 'inline':
         $gap_counter++;
@@ -545,6 +549,11 @@ function _advagg_aggregate_css(&$css_groups) {
         foreach ($group['items'] as $item) {
           $css_groups[$key]['data'] .= drupal_load_stylesheet_content($item['data'], $item['preprocess']);
         }
+        break;
+
+      // Create a gap for external CSS.
+      case 'external':
+        $gap_counter++;
         break;
     }
   }
@@ -611,10 +620,30 @@ function _advagg_aggregate_js(&$js_groups) {
   $files_to_aggregate = array();
   // Only aggregate when the site is configured to do so, and not during an
   // update.
+  $gap_counter = 0;
   if ($preprocess_js) {
     foreach ($js_groups as $key => &$group) {
-      if ($group['type'] == 'file' && $group['preprocess']) {
-        $files_to_aggregate[0][] = $group;
+      switch ($group['type']) {
+        // If a file group can be aggregated into a single file, do so, and set
+        // the group's data property to the file path of the aggregate file.
+        case 'file':
+          if ($group['preprocess']) {
+            $files_to_aggregate[$gap_counter][$key] = $group;
+          }
+          else {
+            $gap_counter++;
+          }
+          break;
+
+        // Create a gap for inline JS.
+        case 'inline':
+          $gap_counter++;
+          break;
+
+        // Create a gap for external JS.
+        case 'external':
+          $gap_counter++;
+          break;
       }
     }
   }
