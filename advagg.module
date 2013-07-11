@@ -1482,7 +1482,7 @@ function advagg_pre_render_scripts($elements) {
           if (is_array($item['data'])) {
             $item['type'] = 'setting';
           }
-          elseif (strpos($item['data'], 'http') === 0) {
+          elseif (strpos($item['data'], 'http') === 0 || strpos($item['data'], '//') === 0) {
             $item['type'] = 'external';
           }
           elseif (file_exists(trim($item['data']))) {
