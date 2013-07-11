@@ -61,6 +61,17 @@ define('ADVAGG_ADMIN_CONFIG_ROOT_PATH', 'admin/config/development/performance');
  */
 define('ADVAGG_DEBUG', FALSE);
 
+/**
+ * Scan and fix any JS that was added with the wrong type.
+ */
+define('ADVAGG_JS_FIX_TYPE', TRUE);
+
+/**
+ * Scan and fix any CSS that was added with the wrong type.
+ */
+define('ADVAGG_CSS_FIX_TYPE', TRUE);
+
+
 // Core hook implementations.
 /**
  * Implements hook_hook_info().
@@ -93,6 +104,20 @@ function advagg_module_implements_alter(&$implementations, $hook) {
     $item = array('advagg' => $implementations['advagg']);
     unset($implementations['advagg']);
     $implementations = array_merge($item, $implementations);
+  }
+
+  // Move advagg to the bottom.
+  if ($hook === 'js_alter' && array_key_exists('advagg', $implementations)) {
+    $item = $implementations['advagg'];
+    unset($implementations['advagg']);
+    $implementations['advagg'] = $item;
+  }
+
+  // Move advagg to the bottom.
+  if ($hook === 'css_alter' && array_key_exists('advagg', $implementations)) {
+    $item = $implementations['advagg'];
+    unset($implementations['advagg']);
+    $implementations['advagg'] = $item;
   }
 }
 
@@ -291,6 +316,58 @@ function advagg_theme_registry_alter(&$theme_registry) {
   $index = array_search('template_process_html', $theme_registry['html']['process functions']);
   if ($index !== FALSE) {
     $theme_registry['html']['process functions'][$index] = '_advagg_process_html';
+  }
+}
+
+/**
+ * Implements hook_js_alter().
+ */
+function advagg_js_alter(&$js) {
+  if (!advagg_enabled() || !variable_get('advagg_js_fix_type', ADVAGG_JS_FIX_TYPE)) {
+    return;
+  }
+
+  // Fix type if it was incorrectly set.
+  foreach ($js as $key => &$value) {
+    if (empty($value['data']) || !is_string($value['data'])) {
+      continue;
+    }
+
+    // If type is external but doesn't start with http or //, change it to file.
+    if ($value['type'] == 'external' && stripos($value['data'], 'http://') !== 0 && stripos($value['data'], 'https://') !== 0 && stripos($value['data'], '//') !== 0) {
+      $value['type'] = 'file';
+    }
+
+    // If type is file but it starts with http or //, change it to external.
+    if ((stripos($value['data'], 'http://') === 0 || stripos($value['data'], 'https://') === 0 || stripos($value['data'], '//') === 0) && $value['type'] == 'file') {
+      $value['type'] = 'external';
+    }
+  }
+}
+
+/**
+ * Implements hook_css_alter().
+ */
+function advagg_css_alter(&$css) {
+  if (!advagg_enabled() || !variable_get('advagg_css_fix_type', ADVAGG_CSS_FIX_TYPE)) {
+    return;
+  }
+
+  // Fix type if it was incorrectly set.
+  foreach ($css as $key => &$value) {
+    if (empty($value['data']) || !is_string($value['data'])) {
+      continue;
+    }
+
+    // If type is external but doesn't start with http, change it to file.
+    if ($value['type'] == 'external' && stripos($value['data'], 'http://') !== 0 && stripos($value['data'], 'https://') !== 0) {
+      $value['type'] = 'file';
+    }
+
+    // If type is file but it starts with http, change it to external.
+    if ((stripos($value['data'], 'http://') === 0 || stripos($value['data'], 'https://') === 0) && $value['type'] == 'file') {
+      $value['type'] = 'external';
+    }
   }
 }
 
