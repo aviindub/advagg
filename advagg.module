@@ -107,6 +107,13 @@ function advagg_module_implements_alter(&$implementations, $hook) {
   }
 
   // Move advagg to the bottom.
+  if ($hook === 'element_info_alter' && array_key_exists('advagg', $implementations)) {
+    $item = $implementations['advagg'];
+    unset($implementations['advagg']);
+    $implementations['advagg'] = $item;
+  }
+
+  // Move advagg to the bottom.
   if ($hook === 'js_alter' && array_key_exists('advagg', $implementations)) {
     $item = $implementations['advagg'];
     unset($implementations['advagg']);
@@ -937,6 +944,14 @@ function advagg_get_js($scope = 'header', $javascript = NULL, $skip_alter = FALS
     '#type' => 'scripts',
     '#items' => $items,
   );
+
+  // Aurora & Omega themes uses alter without checking previous value.
+  if (variable_get('advagg_enforce_scripts_callback', TRUE)) {
+    $element_info = &drupal_static('element_info');
+    if ($element_info['scripts']['#aggregate_callback'] != '_advagg_aggregate_js') {
+      advagg_element_info_alter($element_info);
+    }
+  }
 
   return drupal_render($elements);
 }
