@@ -228,9 +228,68 @@ function advagg_missing_create_file($filename, $no_alters = FALSE) {
 
   // Save aggregate file.
   $files_to_save = advagg_save_aggregate($filename, $files, $type, $aggregate_settings);
-  // Update atime
+  // Update atime.
   advagg_update_atime($aggregate_filenames_hash, $aggregate_contents_hash);
+  // Make sure .htaccess file exists in the advagg dir.
+  if (variable_get('advagg_htaccess_check_generate', ADVAGG_HTACCESS_CHECK_GENERATE)) {
+    advagg_htaccess_check_generate($files_to_save, $type);
+  }
+
+  // Return data.
   return array($files_to_save, $type, $aggregate_filenames_hash, $aggregate_contents_hash, $aggregate_settings, $files);
+}
+
+/**
+ * Generate .htaccess rules and place them in advagg dir
+ *
+ * @param $files_to_save
+ *   array of files that where saved..
+ * @param $force
+ *   force recreate the .htaccess file.
+ */
+function advagg_htaccess_check_generate($files_to_save, $type, $force = FALSE) {
+  $data  = "\n";
+  $data .= "<FilesMatch \"^${type}" . ADVAGG_SPACE . "[A-Za-z0-9-_]{43}" . ADVAGG_SPACE . "[A-Za-z0-9-_]{43}" . ADVAGG_SPACE . "[A-Za-z0-9-_]{43}.${type}(\.gz)?\">\n";
+  $data .= "  # No mod_headers\n";
+  $data .= "  <IfModule !mod_headers.c>\n";
+  $data .= "    # No mod_expires\n";
+  $data .= "    <IfModule !mod_expires.c>\n";
+  $data .= "      # Use ETags.\n";
+  $data .= "      FileETag MTime Size\n";
+  $data .= "    </IfModule>\n";
+  $data .= "\n";
+  $data .= "    # Use Expires Directive.\n";
+  $data .= "    <IfModule mod_expires.c>\n";
+  $data .= "      # Do not use ETags.\n";
+  $data .= "      FileETag None\n";
+  $data .= "      # Enable expirations.\n";
+  $data .= "      ExpiresActive On\n";
+  $data .= "      # Cache all aggregated ${type} files for 480 weeks after access (A).\n";
+  $data .= "      ExpiresDefault A290304000\n";
+  $data .= "    </IfModule>\n";
+  $data .= "  </IfModule>\n";
+  $data .= "\n";
+  $data .= "  <IfModule mod_headers.c>\n";
+  $data .= "    # Set a far future Cache-Control header to 480 weeks.\n";
+  $data .= "    Header set Cache-Control \"max-age=290304000, no-transform, public\"\n";
+  $data .= "    # Set a far future Expires header.\n";
+  $data .= "    Header set Expires \"Tue, 20 Jan 2037 04:20:42 GMT\"\n";
+  $data .= "    # Pretend the file was last modified a long time ago in the past.\n";
+  $data .= "    Header set Last-Modified \"Fri, 14 Jan 1983 04:20:42 GMT\"\n";
+  $data .= "    # Do not use etags for cache validation.\n";
+  $data .= "    Header unset ETag\n";
+  $data .= "  </IfModule>\n";
+  $data .= "</FilesMatch>\n";
+
+  foreach (array_keys($files_to_save) as $uri) {
+    $dir = dirname($uri);
+    $htaccess_file = $dir . '/.htaccess';
+    if (!$force && file_exists($htaccess_file)) {
+      continue;
+    }
+
+    advagg_save_data($htaccess_file, $data);
+  }
 }
 
 // Lookup functions.

@@ -71,6 +71,10 @@ define('ADVAGG_JS_FIX_TYPE', TRUE);
  */
 define('ADVAGG_CSS_FIX_TYPE', TRUE);
 
+/**
+ * Generate a .htaccess file in the AdvAgg dirs.
+ */
+define('ADVAGG_HTACCESS_CHECK_GENERATE', TRUE);
 
 // Core hook implementations.
 /**
