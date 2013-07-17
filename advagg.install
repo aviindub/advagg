@@ -561,10 +561,20 @@ function advagg_install_check_via_http(&$requirements) {
         continue;
       }
 
+      // Skip if filename is empty.
+      if (empty($filename)) {
+        continue;
+      }
+
+      // Skip if filename is not long enough,
+      $len = strlen($filename);
+      if ($len < 91 + strlen(ADVAGG_SPACE)*3) {
+        continue;
+      }
+
       // See if this uri contains .gz near the end of it.
       $pos = strripos($filename, '.gz', 91 + strlen(ADVAGG_SPACE)*3);
       if (!empty($pos)) {
-        $len = strlen($filename);
         // If this is a .gz file skip.
         if ($pos == $len-3) {
           continue;
