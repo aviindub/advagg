@@ -70,6 +70,22 @@ function advagg_admin_settings_form($form, $form_state) {
     '#default_value' => variable_get('advagg_ie_css_selector_limiter', ADVAGG_IE_CSS_SELECTOR_LIMITER),
     '#description' => t('Internet Explorer before version 10; IE9, IE8, IE7, & IE6 all have 4095 as the limit for the maximum number of css selectors that can be in a file. Enabling this will prevent CSS aggregates from being created that exceed this limit. <a href="@link">More info</a>.', array('@link' => 'http://blogs.msdn.com/b/ieinternals/archive/2011/05/14/10164546.aspx')),
   );
+  $form['css']['advagg_css_fix_type'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Fix improperly set type'),
+    '#default_value' => variable_get('advagg_css_fix_type', ADVAGG_CSS_FIX_TYPE),
+    '#description' => t('If type is external but does not start with http, change it to be type file. If type is file but it starts with http, change type to be external.'),
+  );
+  $form['js'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('JS Options'),
+  );
+  $form['js']['advagg_js_fix_type'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Fix improperly set type'),
+    '#default_value' => variable_get('advagg_js_fix_type', ADVAGG_JS_FIX_TYPE),
+    '#description' => t('If type is external but does not start with http, change it to be type file. If type is file but it starts with http, change type to be external.'),
+  );
 
   // Clear the cache bins on submit.
   $form['#submit'][] = 'advagg_admin_settings_form_submit';
