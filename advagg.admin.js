@@ -5,12 +5,36 @@
  */
 
 /**
+ * Test to see if the given string contains unicode.
+ *
+ * @param str
+ *   String to test.
+ * @return
+ *   true if string contains non ASCII characters.
+ *   false if string only contains ASCII characters.
+ */
+function advagg_is_unicode(str){
+  for (var i = 0, n = str.length; i < n; i++) {
+    if (str.charCodeAt( i ) > 255) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Toggle the advagg cookie
  *
  * @return
- *   FALSE so the form does not get submitted.
+ *   true if hostname contains unicode.
+ *   false so the form does not get submitted.
  */
 function advagg_toggle_cookie() {
+  // Fallback to submitting the form for Unicode domains like ".рф"
+  if (advagg_is_unicode(document.location.hostname)) {
+    return true;
+  }
+
   var cookie_name = 'AdvAggDisabled';
 
   // See if the cookie exists.
