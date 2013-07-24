@@ -529,6 +529,21 @@ function advagg_install_check_via_http(&$requirements) {
           'description' => $t('If you have fast 404 enabled in your settings.php file, you need to change the <code>404_fast_paths_exclude</code> setting so advagg will work.') . ' ' . $description,
         );
       }
+      elseif (   module_exists('stage_file_proxy')
+              && variable_get('stage_file_proxy_origin', NULL)
+              && strpos(file_get_contents(drupal_get_path('module', 'stage_file_proxy') . '/stage_file_proxy.module'), 'advagg') === FALSE
+                ) {
+        // Stage File Proxy patch is missing.
+        $requirements['advagg_stage_file_proxy_' . $type . '_generation'] = array(
+          'title' => $t('Adv CSS/JS Agg - Fast 404: HTTP Request'),
+          'severity' => REQUIREMENT_ERROR,
+          'value' => $t('HTTP requests to advagg for ' . $type . ' files are not getting through.'),
+          'description' => $t('If you have the <a href="@module">Stage File Proxy</a> module enabled, make sure <a href="@patch">this patch</a> has been applied.', array(
+            '@patch' => 'https://drupal.org/node/1977170#comment-7331810',
+            '@module' => 'https://drupal.org/project/stage_file_proxy',
+          )),
+        );
+      }
       else {
         // Menu callback failed.
         $requirements['advagg_' . $type . '_generation'] = array(
