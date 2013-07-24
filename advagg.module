@@ -130,6 +130,13 @@ function advagg_module_implements_alter(&$implementations, $hook) {
     unset($implementations['advagg']);
     $implementations['advagg'] = $item;
   }
+
+  // Move advagg to the bottom.
+  if ($hook === 'file_url_alter' && array_key_exists('advagg', $implementations)) {
+    $item = $implementations['advagg'];
+    unset($implementations['advagg']);
+    $implementations['advagg'] = $item;
+  }
 }
 
 /**
@@ -167,6 +174,32 @@ function advagg_permission() {
       'description' => t('User can use URL query strings to bypass AdvAgg.'),
     ),
   );
+}
+
+/**
+ * Implements hook_file_url_alter().
+ */
+function advagg_file_url_alter(&$original_uri) {
+  // Do nothing if
+  //  in maintenance_mode
+  //  CDN module does not exist
+  //  CDN far future is disabled
+  //  CDN mode is not basic
+  //  URI does not contain /advagg_
+  //  URI does not contain cdn/farfuture/
+  if (   variable_get('maintenance_mode', FALSE)
+      || !module_exists('cdn')
+      || !variable_get(CDN_BASIC_FARFUTURE_VARIABLE, CDN_BASIC_FARFUTURE_DEFAULT)
+      || variable_get(CDN_MODE_VARIABLE, CDN_MODE_BASIC) != CDN_MODE_BASIC
+      || strpos($original_uri, '/advagg_') === FALSE
+      || strpos($original_uri, 'cdn/farfuture/') === FALSE
+        ) {
+    return;
+  }
+
+  // Remove cdn/farfuture/BASE64/prefix:value/ from the URI.
+  $original_uri = preg_replace('/^.*(cdn\/farfuture\/[A-Za-z0-9-_]{43}\/[A-Za-z]+\:[A-Za-z0-9-_]+\/)/', '', $original_uri);
+  return;
 }
 
 /**
