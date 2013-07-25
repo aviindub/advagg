@@ -367,6 +367,11 @@ function advagg_theme_registry_alter(&$theme_registry) {
  * Implements hook_ajax_render_alter().
  */
 function advagg_ajax_render_alter(&$commands) {
+  // Do not run hook if AdvAgg is disabled.
+  if (!advagg_enabled()) {
+    return;
+  }
+
   // Conditionally adds the default Drupal/jQuery libraries to the page.
   // @see http://drupal.org/node/1279226
   if (function_exists('drupal_add_js_page_defaults')) {
