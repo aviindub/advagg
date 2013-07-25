@@ -46,6 +46,11 @@ function advagg_bundler_admin_settings_form() {
     '#default_value' => variable_get('advagg_bundler_max_css', ADVAGG_BUNDLER_MAX_CSS),
     '#options' => $options,
     '#description' => t('If 0 is selected then the bundler is disabled'),
+    '#states' => array(
+      'disabled' => array(
+        '#edit-advagg-bundler-active' => array('checked' => FALSE),
+      ),
+    ),
   );
   $form['advagg_bundler_max_js'] = array(
     '#type' => 'select',
@@ -53,6 +58,11 @@ function advagg_bundler_admin_settings_form() {
     '#default_value' => variable_get('advagg_bundler_max_js', ADVAGG_BUNDLER_MAX_JS),
     '#options' => $options,
     '#description' => t('If 0 is selected then the bundler is disabled'),
+    '#states' => array(
+      'disabled' => array(
+        '#edit-advagg-bundler-active' => array('checked' => FALSE),
+      ),
+    ),
   );
 
   $form['info'] = array(

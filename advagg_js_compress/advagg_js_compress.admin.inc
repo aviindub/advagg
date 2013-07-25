@@ -48,6 +48,11 @@ function advagg_js_compress_admin_settings_form($form, $form_state) {
     '#title' => t('Inline Compression: Use even if this page is not cacheable'),
     '#default_value' => variable_get('advagg_js_inline_compress_if_not_cacheable', ADVAGG_JS_INLINE_COMPRESS_IF_NOT_CACHEABLE),
     '#description' => t('By checking this box, all Inline JavaScript will be compressed regardless of the state of <a href="@link">drupal_page_is_cacheable()</a>. If the C complied version of JSMin is enabled, this option should not slow down page generation that much; if you are using JSMin+ I recommend keeping this disabled.', array('@link' => 'http://api.drupal.org/api/drupal/includes!bootstrap.inc/function/drupal_page_is_cacheable/7')),
+    '#states' => array(
+      'disabled' => array(
+        ':input[name="advagg_js_inline_compressor"]' => array('value' => "0"),
+      ),
+    ),
   );
 
   $form['advagg_js_compress_packer'] = array(
@@ -55,6 +60,11 @@ function advagg_js_compress_admin_settings_form($form, $form_state) {
     '#title' => t('Use Packer on non GZip JS Aggregates'),
     '#default_value' => variable_get('advagg_js_compress_packer', ADVAGG_JS_COMPRESS_PACKER),
     '#description' => t('If enabled the non gzip version of JS files will be compressed using the JS Packer. Packer works similar to gzip, thus using packer on a gzipped file does not give a big improvement in terms of bytes transfered over the wire. WARNING: This has a high chance of breaking your JS. Only Enable on production after testing the non gzipped version locally.'),
+    '#states' => array(
+      'disabled' => array(
+        ':input[name="advagg_js_compressor"]' => array('value' => "0"),
+      ),
+    ),
   );
 
   // Clear the cache bins on submit.

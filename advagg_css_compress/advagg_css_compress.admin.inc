@@ -39,6 +39,11 @@ function advagg_css_compress_admin_settings_form($form, $form_state) {
     '#title' => t('Inline Compression: Use even if this page is not cacheable'),
     '#default_value' => variable_get('advagg_css_inline_compress_if_not_cacheable', ADVAGG_CSS_INLINE_COMPRESS_IF_NOT_CACHEABLE),
     '#description' => t('By checking this box, all Inline CSS will be compressed regardless of the state of <a href="@link">drupal_page_is_cacheable()</a>.', array('@link' => 'http://api.drupal.org/api/drupal/includes!bootstrap.inc/function/drupal_page_is_cacheable/7')),
+    '#states' => array(
+      'disabled' => array(
+        ':input[name="advagg_css_inline_compressor"]' => array('value' => "0"),
+      ),
+    ),
   );
   // Clear the cache bins on submit.
   $form['#submit'][] = 'advagg_css_compress_admin_settings_form_submit';
