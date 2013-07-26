@@ -68,6 +68,11 @@ function advagg_validator_scan_all_dirs($ext) {
 function advagg_validator_test_css_files($files, $options = array()) {
   $output = array();
   foreach ($files as $filename) {
+    // Skip missing files.
+    if (!file_exists($filename)) {
+      continue;
+    }
+
     $file_contents = file_get_contents($filename);
     $lines = file($filename);
     $filename_hash = drupal_hash_base64($filename);
