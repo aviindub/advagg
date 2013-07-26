@@ -417,7 +417,8 @@ function advagg_admin_toggle_bypass_cookie() {
   }
   // If the cookie does not exist then set it.
   else {
-    setcookie($cookie_name, $key, 0, $GLOBALS['base_path'], '.' . $_SERVER['HTTP_HOST']);
+    // Cookie will last for 12 hours.
+    setcookie($cookie_name, $key, REQUEST_TIME+60*60*12, $GLOBALS['base_path'], '.' . $_SERVER['HTTP_HOST']);
     $_COOKIE[$cookie_name] = $key;
     drupal_set_message(t('AdvAgg Bypass Cookie Set.'));
   }

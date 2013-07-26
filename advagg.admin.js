@@ -43,14 +43,18 @@ function advagg_toggle_cookie() {
   // If the cookie does exist then remove it.
   if (cookie_pos !== -1) {
     document.cookie = cookie_name + '=;'
-      + 'expires=-1;'
+      + 'expires=Thu, 01 Jan 1970 00:00:00 GMT;'
       + ' path=' + Drupal.settings.basePath + ';'
       + ' domain=.' + document.location.hostname + ';';
     alert(Drupal.t('AdvAgg Bypass Cookie Removed'));
   }
   // If the cookie does not exist then set it.
   else {
+    // Cookie will last for 12 hours.
+    var expire_time = new Date();
+    expire_time.setTime(expire_time.getTime()+(1000*60*60*12));
     document.cookie = cookie_name + '=' + Drupal.settings.advagg.key + ';'
+      + ' expires=' + expire_time.toGMTString() + ';'
       + ' path=' + Drupal.settings.basePath + ';'
       + ' domain=.' + document.location.hostname + ';';
     alert(Drupal.t('AdvAgg Bypass Cookie Set'));
