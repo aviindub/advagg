@@ -1226,7 +1226,7 @@ function advagg_enabled() {
   // Disable AdvAgg if module needs to be upgraded from 1.x to 2.x.
   if (!db_table_exists('advagg_aggregates_versions')) {
     $GLOBALS['conf']['advagg_enabled'] = FALSE;
-    if (user_access(array('administer site configuration'))) {
+    if (user_access('administer site configuration')) {
       drupal_set_message(t('Please run <a href="@link">database updates</a>. AdvAgg will remain disabled until done.', array('@link' => url('update.php'))), 'error');
     }
   }
@@ -1245,7 +1245,7 @@ function advagg_enabled() {
       static $msg_set;
       if (!isset($msg_set)) {
         $msg_set = TRUE;
-        if (user_access(array('administer site configuration'))) {
+        if (user_access('administer site configuration')) {
           drupal_set_message(t('The AdvAgg bypass cookie is currently enabled. Turn it off by going to the <a href="@advagg_operations">AdvAgg Operations</a> page and clicking the <em>Toggle the "aggregation bypass cookie" for this browser</em> button.', array(
           '@advagg_operations' => url(advagg_admin_config_root_path() . '/advagg/operations', array('fragment' => 'edit-bypass')),
           )));
