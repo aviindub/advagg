@@ -6,10 +6,7 @@
  */
 
 /**
- * Form builder; Configure advagg settings.
- *
- * @ingroup forms
- * @see system_settings_form()
+ * Form builder; validator advagg.
  */
 function advagg_validator_admin_settings_form() {
   drupal_set_title(t('AdvAgg: Validator'));
@@ -130,6 +127,14 @@ function advagg_validator_admin_test_all_css_callback($form, &$form_state) {
   return '<div id="advagg-validator-css-validator-ajax">' . $output . '</div>';
 }
 
+/**
+ * Do not display info on a file if it is valid.
+ *
+ * @param array $info
+ *   Array containing info about validators and if the file is valid.
+ * @return array
+ *   $info array minus data if that file is valid.
+ */
 function advagg_validator_admin_hide_good_files($info) {
   $output = array();
   foreach ($info as $filename => $validators) {
