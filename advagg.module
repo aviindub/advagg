@@ -1460,7 +1460,7 @@ function advagg_get_root_files_dir() {
  * Gets the core CSS/JS included in this ajax request.
  *
  * Used so core JS can be rendered through the AdvAgg pipeline.
- * @see ajax_render().
+ * @see ajax_render()
  *
  * @return array
  *   Returns an array containing $styles, $scripts_header, $scripts_footer,

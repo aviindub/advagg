@@ -134,11 +134,12 @@ function advagg_validator_test_css_files($files, $options = array()) {
  * Given a CSS file, test to make sure it is valid CSS.
  *
  * @param string $filename
- *    The name of the file.
+ *   The name of the file.
  * @param array $validator_options
- *    List of options to pass along to the CSS Validator.
+ *   List of options to pass along to the CSS Validator.
  *
  * @return array
+ *   Info from the w3c server.
  */
 function advagg_validator_test_css_file_w3c($filename, &$validator_options = array()) {
   // Get public URL for file.
@@ -194,9 +195,10 @@ function advagg_validator_test_css_file_w3c($filename, &$validator_options = arr
  * This function parses a SOAP 1.2 response XML string from the validator.
  *
  * @param string $XML
- *    The raw SOAP 1.2 XML response from the validator.
+ *   The raw SOAP 1.2 XML response from the validator.
  *
  * @return array
+ *   Info from the w3c server.
  */
 function advagg_validator_parse_soap_response_w3c($XML) {
   $doc = new DOMDocument();
@@ -240,6 +242,15 @@ function advagg_validator_parse_soap_response_w3c($XML) {
   return $response;
 }
 
+/**
+ * Extract info from the DOMNode Object.
+ *
+ * @param object $dom
+ *   DOMNode Class
+ *
+ * @return array
+ *   Key Value pair from the DOM Node.
+ */
 function advagg_validator_dom_extractor($dom) {
   $node = $dom->firstChild;
   $output = array();
