@@ -381,6 +381,11 @@ function advagg_ajax_render_alter(&$commands) {
   // Remove core JS.
   list($styles, $scripts_header, $scripts_footer, $items, $settings) = advagg_build_ajax_js_css();
   foreach ($commands as $key => $values) {
+    // Skip if not an array or not a command.
+    if (!is_array($values) || empty($values['command'])) {
+      continue;
+    }
+
     if (   $values['command'] == 'settings'
         && is_array($values['settings'])
         && !empty($values['merge'])
