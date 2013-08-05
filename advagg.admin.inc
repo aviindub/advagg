@@ -23,16 +23,20 @@ function advagg_admin_settings_form($form, $form_state) {
     '#type' => 'checkbox',
     '#title' => t('Enable advanced aggregation'),
     '#default_value' => variable_get('advagg_enabled', ADVAGG_ENABLED),
+    '#description' => t('Uncheck this box to completely disable AdvAgg functionality.'),
   );
   $form['global']['advagg_gzip'] = array(
     '#type' => 'checkbox',
     '#title' => t('Create .gz files'),
     '#default_value' => variable_get('advagg_gzip', ADVAGG_GZIP),
+    '#description' => t('All aggregated files can be pre-compressed into a .gz file and
+   served from Apache. This is faster then gzipping the file on each request.'),
   );
   $form['global']['advagg_core_groups'] = array(
     '#type' => 'checkbox',
     '#title' => t('Use cores grouping logic'),
     '#default_value' => variable_get('advagg_core_groups', ADVAGG_CORE_GROUPS),
+    '#description' => t('Will group files just like core does.'),
     '#states' => array(
       'enabled' => array(
         '#edit-advagg-combine-css-media' => array('checked' => FALSE),
@@ -45,6 +49,7 @@ function advagg_admin_settings_form($form, $form_state) {
     '#title' => t('Use HTTPRL to generate aggregates.'),
     '#default_value' => module_exists('httprl') ? variable_get('advagg_use_httprl', ADVAGG_USE_HTTPRL) : FALSE,
     '#disabled' => module_exists('httprl') ? FALSE : TRUE,
+    '#description' => t('If <a href="@link">HTTPRL</a> is installed, advagg will use it to generate aggregates on the fly in a background parallel process.', array('@link' => 'http://drupal.org/project/httprl')),
   );
   $options = array(
     -1 => t('Development ~ 100ms'),
@@ -68,7 +73,7 @@ function advagg_admin_settings_form($form, $form_state) {
     '#type' => 'checkbox',
     '#title' => t('Combine CSS files by using media queries'),
     '#default_value' => variable_get('advagg_combine_css_media', ADVAGG_COMBINE_CSS_MEDIA),
-    '#description' => t('Use cores grouping logic needs to be unchecked in order for this to work. Also noted is that due to an issue with IE9, compatibility mode is forced off if this is enabled.'),
+    '#description' => t('Will combine more CSS files together because different CSS media types can be used in the same file by using media queries. Use cores grouping logic needs to be unchecked in order for this to work. Also noted is that due to an issue with IE9, compatibility mode is forced off if this is enabled.'),
     '#states' => array(
       'disabled' => array(
         '#edit-advagg-core-groups' => array('checked' => TRUE),
