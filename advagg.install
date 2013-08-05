@@ -523,6 +523,19 @@ function advagg_install_check_via_http(&$requirements) {
             'description' => $t('If you have fast 404 enabled in your settings.php file, you need to change the <code>404_fast_paths_exclude</code> setting so advagg will work.') . ' ' . $description,
           );
         }
+        elseif (   module_exists('fast_404')
+                && defined('FAST_404_EXT_CHECKED')
+                && !in_array('/advagg_', variable_get('fast_404_string_whitelisting', array()))
+                && strpos(variable_get('fast_404_exts', '/^(?!robots).*\.(txt|png|gif|jpe?g|css|js|ico|swf|flv|cgi|bat|pl|dll|exe|asp)$/i'), $type)
+                  ) {
+          $requirements['advagg_404_fast_module_' . $type . '_generation'] = array(
+            'title' => $t('Adv CSS/JS Agg - Fast 404: HTTP Request'),
+            'severity' => REQUIREMENT_ERROR,
+            'value' => $t('HTTP requests to advagg for ' . $type . ' files are not getting through.'),
+            'description' => $t('The fast 404 module is enabled. You need to change the <code>fast_404_string_whitelisting</code> setting so advagg will work. In your settings.php file add in the code below: <pre>@code</pre>',
+              array('@code' => '$conf[\'fast_404_string_whitelisting\'][] = \'/advagg_\';')),
+          );
+        }
         elseif (   module_exists('stage_file_proxy')
                 && variable_get('stage_file_proxy_origin', NULL)
                 && strpos(file_get_contents(drupal_get_path('module', 'stage_file_proxy') . '/stage_file_proxy.module'), 'advagg') === FALSE
