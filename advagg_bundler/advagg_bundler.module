@@ -175,30 +175,58 @@ function advagg_bundler_analysis($filename = '', $force = FALSE) {
       $subquery_aggregates = db_select('advagg_aggregates', 'aa');
       $subquery_aggregates->join($subquery_aggregates_versions, 'aav', 'aav.aggregate_filenames_hash=aa.aggregate_filenames_hash');
       $subquery_aggregates->addExpression("LPAD(CAST(COUNT(aav.aggregate_filenames_hash) AS char(8)), 8, '0')", 'counter');
-      $subquery_aggregates = $subquery_aggregates->fields('aav', array('aggregate_filenames_hash'))
-        ->fields('aa', array('filename_hash', 'porder'))
+
+      $fields = array('counter');
+      $db_type = Database::getConnection()->databaseType();
+      if ($db_type == 'mysql') {
+        db_query('SET SESSION group_concat_max_len = 65535');
+        $fields = array('counter', 'hashlist');
+        $subquery_aggregates->addExpression('GROUP_CONCAT(DISTINCT aa.aggregate_filenames_hash ORDER BY aa.aggregate_filenames_hash ASC)', 'hashlist');
+      }
+
+      $subquery_aggregates = $subquery_aggregates->fields('aa', array('filename_hash'))
         ->groupBy('aa.filename_hash');
 
       // Create main query for the advagg_files table.
       $query = db_select('advagg_files', 'af');
       $query->join($subquery_aggregates, 'aa', 'af.filename_hash=aa.filename_hash');
-      $query = $query->fields('af', array('filename', 'filesize', 'mtime', 'changes', 'linecount'))
-        ->fields('aa', array('counter', 'aggregate_filenames_hash'))
-        ->orderBy('aa.counter', 'DESC')
-        ->orderBy('aa.aggregate_filenames_hash', 'ASC')
-        ->orderBy('aa.porder', 'ASC');
+      $query = $query->fields('af', array('filename', 'filesize', 'mtime', 'changes', 'linecount', 'filename_hash'))
+        ->fields('aa', $fields)
+        ->orderBy('aa.counter', 'DESC');
       $results = $query->execute();
 
       $analysis = array();
       foreach ($results as $row) {
+        // Implement slower GROUP_CONCAT functionality for non mysql databases.
+        if (empty($row->hashlist)) {
+          $subquery_aggregates_versions = db_select('advagg_aggregates_versions', 'aav')
+            ->fields('aav')
+            ->condition('aav.root', 1)
+            ->condition('aav.atime', REQUEST_TIME - ADVAGG_BUNDLER_OUTDATED, '>');
+
+          $subquery_aggregates = db_select('advagg_aggregates', 'aa');
+          $subquery_aggregates->join($subquery_aggregates_versions, 'aav', 'aav.aggregate_filenames_hash=aa.aggregate_filenames_hash');
+          $subquery_aggregates = $subquery_aggregates->fields('aa', array('aggregate_filenames_hash'))
+            ->condition('aa.filename_hash', $row->filename_hash)
+            ->groupBy('aa.aggregate_filenames_hash')
+            ->orderBy('aa.aggregate_filenames_hash', 'ASC');
+          $aa_results = $subquery_aggregates->execute();
+          $aa_rows = array();
+          foreach ($aa_results as $aa_row) {
+            $aa_rows[] = $aa_row->aggregate_filenames_hash;
+          }
+          $row->hashlist = implode(',', $aa_rows);
+        }
+
         $analysis[$row->filename] = array(
-          'group_hash' => $row->counter . ' ' . $row->aggregate_filenames_hash,
+          'group_hash' => $row->counter . ' ' . drupal_hash_base64($row->hashlist),
           'mtime' => $row->mtime,
           'filesize' => $row->filesize,
           'linecount' => $row->linecount,
           'changes' => $row->changes,
         );
       }
+      arsort($analysis);
 
       // Invoke hook_advagg_bundler_analysis_alter() to give installed modules a
       // chance to alter the analysis array.
