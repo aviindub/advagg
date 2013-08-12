@@ -305,6 +305,10 @@ function advagg_flush_caches($all_bins = FALSE) {
     return array();
   }
 
+  // Scan for new changes.
+  module_load_include('inc', 'advagg', 'advagg.cache');
+  $flushed = advagg_push_new_changes();
+
   // Get list of cache bins to clear.
   $bins = array();
   $bins[] = 'cache_advagg_aggregates';

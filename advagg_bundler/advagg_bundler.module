@@ -78,6 +78,7 @@ function advagg_bundler_form_advagg_admin_settings_form_alter(&$form, $form_stat
   if (advagg_bundler_enabled()) {
     $form['global']['advagg_core_groups']['#disabled'] = TRUE;
     $form['global']['advagg_core_groups']['#description'] = t('The bundler submodule disables core grouping logic.');
+    $form['global']['advagg_core_groups']['#states'] = array();
   }
 }
 
