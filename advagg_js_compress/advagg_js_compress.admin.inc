@@ -67,6 +67,45 @@ function advagg_js_compress_admin_settings_form($form, $form_state) {
     ),
   );
 
+  $options[-1] = t('Default');
+  ksort($options);
+
+  $form['per_file_settings'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Per File Settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  // Get filename & filename_hash.
+  $results = db_select('advagg_files', 'af')
+    ->fields('af', array('filename'))
+    ->condition('filetype', 'js')
+    ->orderBy('af.filename', 'ASC')
+    ->execute();
+  $file_settings = variable_get('advagg_js_compressor_file_settings', array());
+  foreach ($results as $row) {
+    $dir = dirname($row->filename);
+    if (!isset($form['per_file_settings'][$dir])) {
+      $form['per_file_settings'][$dir] = array(
+        '#type' => 'fieldset',
+        '#title' => $dir,
+        '#collapsible' => TRUE,
+        '#collapsed' => TRUE,
+      );
+    }
+    $form_api_filename = str_replace(array('/', '.'), array('__', '--'), $row->filename);
+    $form['per_file_settings'][$dir]['advagg_js_compressor_file_settings_' . $form_api_filename] = array(
+      '#type' => 'radios',
+      '#title' => t('%filename: Select a Compressor', array('%filename' => $row->filename)),
+      '#default_value' => isset($file_settings[$form_api_filename]) ? $file_settings[$form_api_filename] : ADVAGG_JS_COMPRESSOR_FILE_SETTINGS,
+      '#options' => $options,
+    );
+    if ($form['per_file_settings'][$dir]['advagg_js_compressor_file_settings_' . $form_api_filename]['#default_value'] != ADVAGG_JS_COMPRESSOR_FILE_SETTINGS) {
+      $form['per_file_settings'][$dir]['#collapsed'] = FALSE;
+      $form['per_file_settings']['#collapsed'] = FALSE;
+    }
+  }
+
   // Clear the cache bins on submit.
   $form['#submit'][] = 'advagg_js_compress_admin_settings_form_submit';
 
@@ -76,10 +115,38 @@ function advagg_js_compress_admin_settings_form($form, $form_state) {
 // Submit callback.
 /**
  * Clear out the advagg cache bin when the save configuration button is pressed.
+ *
+ * Also remove default settings inside of the per_file_settings fieldgroup.
  */
 function advagg_js_compress_admin_settings_form_submit($form, &$form_state) {
   $cache_bins = advagg_flush_caches();
   foreach ($cache_bins as $bin) {
     cache_clear_all('*', $bin, TRUE);
+  }
+
+  // Get current defaults
+  $file_settings = variable_get('advagg_js_compressor_file_settings', array());
+
+  // Save per file settings.
+  $new_settings = array();
+  foreach ($form_state['values'] as $key => $value) {
+    // Skip if not advagg_js_compressor_file_settings
+    if (strpos($key, 'advagg_js_compressor_file_settings_') === FALSE) {
+      continue;
+    }
+    // Do not process default settings.
+    if ($value == ADVAGG_JS_COMPRESSOR_FILE_SETTINGS) {
+      unset($form_state['values'][$key]);
+      continue;
+    }
+    $new_settings[substr($key, 35)] = $value;
+  }
+  if (!empty($new_settings) || !empty($file_settings)) {
+    if (empty($new_settings)) {
+      variable_del('advagg_js_compressor_file_settings');
+    }
+    else {
+      variable_set('advagg_js_compressor_file_settings', $new_settings);
+    }
   }
 }

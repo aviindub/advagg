@@ -11,6 +11,14 @@
  * Used to compress a js file.
  */
 function advagg_js_compress_advagg_get_js_file_contents_alter(&$contents, $filename, $aggregate_settings) {
+  // Get per file settings.
+  if (!empty($aggregate_settings['variables']['advagg_js_compressor_file_settings'])) {
+    $form_api_filename = str_replace(array('/', '.'), array('__', '--'), $filename);
+    if (isset($aggregate_settings['variables']['advagg_js_compressor_file_settings'][$form_api_filename])) {
+      $aggregate_settings['variables']['advagg_js_compressor'] = $aggregate_settings['variables']['advagg_js_compressor_file_settings'][$form_api_filename];
+    }
+  }
+
   // Do nothing if js file compression is disabled.
   if (empty($aggregate_settings['variables']['advagg_js_compressor'])) {
     return;
@@ -147,6 +155,10 @@ function advagg_js_compress_prep(&$contents, $filename, $aggregate_settings, $ad
   // Get the info on this file.
   module_load_include('inc', 'advagg', 'advagg');
   $compressor = $aggregate_settings['variables']['advagg_js_compressor'];
+
+  if ($compressor == 0) {
+    return;
+  }
 
   // Get the JS string length before the compression operation.
   $contents_before = $contents;
