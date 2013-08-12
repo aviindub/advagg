@@ -40,7 +40,6 @@ define('ADVAGG_JS_MAX_COMPRESS_RATIO', 0.9);
  */
 define('ADVAGG_JS_COMPRESSOR_FILE_SETTINGS', -1);
 
-
 /**
  * Implementation of hook_menu
  */

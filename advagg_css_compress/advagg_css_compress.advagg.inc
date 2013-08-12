@@ -9,6 +9,14 @@
  * Implement hook_advagg_get_css_aggregate_contents_alter().
  */
 function advagg_css_compress_advagg_get_css_aggregate_contents_alter(&$data, $files, $aggregate_settings) {
+  // Get per file settings.
+  if (!empty($aggregate_settings['variables']['advagg_css_compressor_file_settings'])) {
+    $form_api_filename = str_replace(array('/', '.'), array('__', '--'), $filename);
+    if (isset($aggregate_settings['variables']['advagg_css_compressor_file_settings'][$form_api_filename])) {
+      $aggregate_settings['variables']['advagg_css_compressor'] = $aggregate_settings['variables']['advagg_css_compressor_file_settings'][$form_api_filename];
+    }
+  }
+
   if (empty($aggregate_settings['variables']['advagg_css_compressor'])) {
     return;
   }
