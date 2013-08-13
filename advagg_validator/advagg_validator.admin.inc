@@ -138,7 +138,6 @@ function advagg_validator_admin_test_advagg_css_directory_submit($form, &$form_s
   if (!empty($form_state['input']['ajax_page_state']) || empty($form_state['values']['op']) || strpos($form_state['values']['op'], t('Check this Directory:')) !== 0) {
     return;
   }
-
   module_load_include('inc', 'advagg_validator', 'advagg_validator');
 
   $dir = trim(substr($form_state['values']['op'], strpos($form_state['values']['op'], ':')+1));
@@ -173,6 +172,8 @@ function advagg_validator_admin_test_advagg_css_directory_callback($form, &$form
   if (empty($form_state['values']['op']) || strpos($form_state['values']['op'], t('Check this Directory:')) !== 0) {
     return '<div></div>';
   }
+  module_load_include('inc', 'advagg_validator', 'advagg_validator');
+
   $dir = trim(substr($form_state['values']['op'], strpos($form_state['values']['op'], ':')+1));
   $slash_count = substr_count('/' . $dir, '/');
 
