@@ -171,7 +171,7 @@ function advagg_validator_test_css_file_w3c($filename, &$validator_options = arr
 //   else {
 //     $validator_options['uri'] = $test_url;
 //   }
-  $validator_options['uri'] = $test_url;
+  $validator_options['text'] = file_get_contents($filename);
 
   // Add in defaults.
   $validator_options += array(
