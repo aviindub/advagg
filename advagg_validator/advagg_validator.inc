@@ -165,12 +165,12 @@ function advagg_validator_test_css_file_w3c($filename, &$validator_options = arr
     $ip = gethostbyname($parse['host']);
   }
   // If IP is not externally routable, send raw text instead of uri.
-  if (ip2long($ip) === FALSE || advagg_validator_reserved_ip($ip)) {
-    $validator_options['text'] = file_get_contents($filename);
-  }
-  else {
+//   if (ip2long($ip) === FALSE || advagg_validator_reserved_ip($ip)) {
+//     $validator_options['text'] = file_get_contents($filename);
+//   }
+//   else {
     $validator_options['uri'] = $test_url;
-  }
+//   }
 
   // Add in defaults.
   $validator_options += array(
