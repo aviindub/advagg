@@ -104,6 +104,9 @@ function advagg_validator_test_css_files($files, $options = array()) {
       foreach ($output[$filename]['jigsaw.w3.org']['errors'] as $key => &$value) {
         if (isset($value['line'])) {
           $value['linedata'] = $lines[($value['line']-1)];
+          if (strlen($value['linedata']) > 512) {
+            unset($value['linedata']);
+          }
         }
       }
     }
@@ -111,6 +114,9 @@ function advagg_validator_test_css_files($files, $options = array()) {
       foreach ($output[$filename]['jigsaw.w3.org']['warnings'] as $key => &$value) {
         if (isset($value['line'])) {
           $value['linedata'] = $lines[$value['line']-1];
+          if (strlen($value['linedata']) > 512) {
+            unset($value['linedata']);
+          }
         }
       }
     }
@@ -151,21 +157,21 @@ function advagg_validator_test_css_file_w3c($filename, &$validator_options = arr
   $test_url = file_create_url($filename);
   $parse = @parse_url($test_url);
 
+  // Get IP Address.
   if (ip2long($parse['host']) !== FALSE) {
     $ip = $parse['host'];
   }
   else {
     $ip = gethostbyname($parse['host']);
-    if (ip2long($ip) === FALSE) {
-      return array('error' => t('Can not get IP Address (@ip) from @host.', array('@ip' => $ip, '@host' => $parse['host'])));
-    }
   }
-  if (advagg_validator_reserved_ip($ip)) {
-    return array('error' => t('IP Address @ip for @host is not externally routable.', array('@ip' => $ip, '@host' => $parse['host'])));;
+  // If IP is not externally routable, send raw text instead of uri.
+  if (ip2long($ip) === FALSE || advagg_validator_reserved_ip($ip)) {
+    $validator_options['text'] = file_get_contents($filename);
+  }
+  else {
+    $validator_options['uri'] = $test_url;
   }
 
-  // Set uri.
-  $validator_options['uri'] = $test_url;
   // Add in defaults.
   $validator_options += array(
     'output' => 'soap12',
@@ -186,7 +192,10 @@ function advagg_validator_test_css_file_w3c($filename, &$validator_options = arr
   if (!empty($result->data) && $result->code == 200) {
     // Parse XML & return info.
     $return = advagg_validator_parse_soap_response_w3c($result->data);
-    $return['url'] = $url;
+    $return['filename'] = $filename;
+    if (isset($validator_options['text'])) {
+      unset($validator_options['text']);
+    }
     $return['options'] = $validator_options;
     return $return;
   }
