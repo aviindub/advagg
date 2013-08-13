@@ -154,4 +154,13 @@ function advagg_js_compress_test_file($filename, $compressors) {
   return $results;
 }
 
-
+/**
+ * Test a JS file to see if it compresses well; called from httprl background.
+ *
+ * @param $filename
+ *   Path and filename of JS file.
+ */
+function advagg_js_compress_run_test_httprl($filename) {
+  module_load_include('inc', 'advagg_js_compress', 'advagg_js_compress.advagg');
+  return advagg_js_compress_run_test($filename);
+}

@@ -30,7 +30,20 @@ function advagg_js_compress_advagg_get_js_file_contents_alter(&$contents, $filen
   $info = advagg_get_info_on_file($filename);
   if (!isset($info['advagg_js_compress'][$compressor]['code'])) {
     // Test file here on the spot.
-    $info = advagg_js_compress_run_test($filename);
+    if (!module_exists('httprl') || !httprl_is_background_callback_capable()) {
+      $info = advagg_js_compress_run_test($filename);
+    }
+    else {
+      $compressors = array(1 => 'jsminplus', 2 => 'packer', 3 => 'jsmin');
+      // Add in selected compressor.
+      $compressors_to_test = array($compressor => $compressors[$compressor]);
+      // Add in packer if enabled.
+      if (!empty($aggregate_settings['variables']['advagg_js_compress_packer'])) {
+        $compressors_to_test[2] = 'packer';
+        ksort($compressors_to_test);
+      }
+      $info = advagg_js_compress_run_test($filename, $compressors_to_test);
+    }
   }
 
   // Compress it if it passes the test.
@@ -70,7 +83,15 @@ function advagg_js_compress_advagg_save_aggregate_alter(&$files_to_save, $aggreg
   foreach ($files as $file => $settings) {
     $info = advagg_get_info_on_file($file);
     if (!isset($info['advagg_js_compress'][$compressor]['code'])) {
-      $info = advagg_js_compress_run_test($file);
+      // Test file here on the spot.
+      if (!module_exists('httprl') || !httprl_is_background_callback_capable()) {
+        $info = advagg_js_compress_run_test($file);
+      }
+      else {
+        // Add in selected compressor.
+        $compressors = array(1 => 'jsminplus', 2 => 'packer', 3 => 'jsmin');
+        $info = advagg_js_compress_run_test($file, array($compressor => $compressors[$compressor]));
+      }
     }
     // If this file causes php to bomb or the ratio is way too good then do not
     // use packer on this aggregrate.
@@ -270,8 +291,10 @@ function advagg_js_compress_jspacker(&$contents) {
  *
  * @param $filename
  *   Path and filename of JS file.
+ * @param $compressors
+ *   (optional) List of compressors to test.
  */
-function advagg_js_compress_run_test($filename) {
+function advagg_js_compress_run_test($filename, $compressors = array()) {
   // Get the info on this file.
   module_load_include('inc', 'advagg', 'advagg');
   $info = advagg_get_info_on_file($filename);
@@ -279,12 +302,19 @@ function advagg_js_compress_run_test($filename) {
   $filename_hashes = &drupal_static('advagg_get_info_on_file');
   $cache_id = 'advagg:file:' . $info['filename_hash'];
   $httprl_used = FALSE;
+  $compressor_list = array(1 => 'jsminplus', 2 => 'packer');
+  if (function_exists('jsmin')) {
+    $compressor_list[3] = 'jsmin';
+    ksort($compressor_list);
+  }
 
   // Build list of compressors.
-  $compressors = array(1 => 'jsminplus', 2 => 'packer');
-  if (function_exists('jsmin')) {
-    $compressors[3] = 'jsmin';
-    ksort($compressors);
+  if (empty($compressors)) {
+    $compressors = $compressor_list;
+  }
+  elseif (count($compressors) != count($compressor_list)) {
+    // Schedule full test in a shutdown function later on.
+    register_shutdown_function('advagg_js_compress_run_test_shutdown', $filename);
   }
 
   // Set to 0 if file doesn't exist.
@@ -352,6 +382,7 @@ function advagg_js_compress_run_test($filename) {
       }
     }
   }
+
   // Place results into array.
   $info['advagg_js_compress'] = $results;
 
@@ -359,4 +390,37 @@ function advagg_js_compress_run_test($filename) {
   $filename_hashes[$cache_id] = $info;
   cache_set($cache_id, $info, 'cache_advagg_info', CACHE_PERMANENT);
   return $info;
+}
+
+/**
+ * Test a JS file to see if it compresses well; called from a shutdown function.
+ *
+ * @param $filename
+ *   Path and filename of JS file.
+ */
+function advagg_js_compress_run_test_shutdown($filename) {
+  $been_called = &drupal_static(__FUNCTION__);
+
+  // Only run this once per filename.
+  if (!empty($been_called[$filename])) {
+    return;
+  }
+  $been_called[$filename] = TRUE;
+
+  if (module_exists('httprl') && httprl_is_background_callback_capable()) {
+    // Setup callback options array.
+    $callback_options = array(
+      array(
+        'function' => 'advagg_js_compress_run_test_httprl',
+      ),
+      $filename,
+    );
+    // Queue up the request.
+    httprl_queue_background_callback($callback_options);
+    // Execute request.
+    httprl_send_request();
+  }
+  else {
+    advagg_js_compress_run_test($filename);
+  }
 }
