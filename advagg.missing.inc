@@ -248,6 +248,11 @@ function advagg_missing_create_file($filename, $no_alters = FALSE) {
  *   force recreate the .htaccess file.
  */
 function advagg_htaccess_check_generate($files_to_save, $type, $force = FALSE) {
+  $content_type = $type;
+  if ($content_type == 'js') {
+    $content_type = 'javascript';
+  }
+
   $data  = "\n";
   $data .= "<FilesMatch \"^${type}" . ADVAGG_SPACE . "[A-Za-z0-9-_]{43}" . ADVAGG_SPACE . "[A-Za-z0-9-_]{43}" . ADVAGG_SPACE . "[A-Za-z0-9-_]{43}.${type}(\.gz)?\">\n";
   $data .= "  # No mod_headers\n";
@@ -270,6 +275,8 @@ function advagg_htaccess_check_generate($files_to_save, $type, $force = FALSE) {
   $data .= "  </IfModule>\n";
   $data .= "\n";
   $data .= "  <IfModule mod_headers.c>\n";
+  $data .= "    # Serve correct content type.\n";
+  $data .= "    Header set Content-Type text/${content_type}\n";
   $data .= "    # Set a far future Cache-Control header to 480 weeks.\n";
   $data .= "    Header set Cache-Control \"max-age=290304000, no-transform, public\"\n";
   $data .= "    # Set a far future Expires header.\n";

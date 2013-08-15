@@ -696,12 +696,27 @@ function advagg_install_check_via_http(&$requirements) {
             'title' => $t('Adv CSS/JS Agg - gzip'),
             'severity' => REQUIREMENT_WARNING,
             'value' => $t('Gzip is failing for %type files.', array('%type' => $type)),
-            'description' => $t('The web servers configuration will need to be adjusted. In most cases make sure that the webroots .htaccess file still contains this section "Rules to correctly serve gzip compressed CSS and JS files".', array(
-              '@advagg' => url($config_path . '/advagg'),
-            )),
+            'description' => $t('The web servers configuration will need to be adjusted. In most cases make sure that the webroots .htaccess file still contains this section "Rules to correctly serve gzip compressed CSS and JS files".'),
           );
         }
       }
+    }
+    $content_type = $type;
+    if ($content_type == 'js') {
+      $content_type = 'javascript';
+    }
+    if (empty($request->headers['content-type']) || $request->headers['content-type'] != 'text/' . $content_type) {
+      // Recommend servers configuration be adjusted.
+      $requirements['advagg_' . $type . '_type'] = array(
+        'title' => $t('Adv CSS/JS Agg - Content-Type'),
+        'severity' => REQUIREMENT_WARNING,
+        'value' => $t('The wrong Content-Type is being sent by your webserver.', array('%type' => $type)),
+        'description' => $t('The web servers configuration will need to be adjusted. Was looking for <code>@typematch</code>, actaully got <code>@received</code>. You might need to apply the drupal core patch located here <a href="@url">@url</a>.', array(
+          '@url' => 'https://drupal.org/node/1440534',
+          '@typematch' => 'text/' . $content_type,
+          '@received' => isset($request->headers['content-type']) ? $request->headers['content-type'] : 'NULL',
+        )),
+      );
     }
   }
 }
