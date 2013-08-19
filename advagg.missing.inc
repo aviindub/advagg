@@ -185,13 +185,6 @@ function advagg_missing_set_farfuture_headers() {
   // Set a far future Expires header. The maximum UNIX timestamp is somewhere
   // in 2038. Set it to a date in 2037, just to be safe.
   header("Expires: Tue, 20 Jan 2037 04:08:15 GMT");
-  // Pretend the file was last modified a long time ago in the past, this will
-  // prevent browsers that don't support Cache-Control nor Expires headers to
-  // still request a new version too soon (these browsers calculate a
-  // heuristic to determine when to request a new version, based on the last
-  // time the resource has been modified).
-  // Also see http://code.google.com/speed/page-speed/docs/caching.html.
-  header("Last-Modified: Fri, 14 Oct 1983 00:16:23 GMT");
 }
 
 /**
@@ -281,8 +274,6 @@ function advagg_htaccess_check_generate($files_to_save, $type, $force = FALSE) {
   $data .= "    Header set Cache-Control \"max-age=290304000, no-transform, public\"\n";
   $data .= "    # Set a far future Expires header.\n";
   $data .= "    Header set Expires \"Tue, 20 Jan 2037 04:20:42 GMT\"\n";
-  $data .= "    # Pretend the file was last modified a long time ago in the past.\n";
-  $data .= "    Header set Last-Modified \"Fri, 14 Jan 1983 04:20:42 GMT\"\n";
   $data .= "    # Do not use etags for cache validation.\n";
   $data .= "    Header unset ETag\n";
   $data .= "  </IfModule>\n";

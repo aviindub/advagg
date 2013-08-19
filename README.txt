@@ -201,7 +201,6 @@ http://drupal.org/node/1116618
       expires    max;
       add_header ETag "";
       add_header Cache-Control "max-age=290304000, no-transform, public";
-      add_header Last-Modified "Wed, 20 Jan 1988 04:20:42 GMT";
       try_files  $uri @drupal;
     }
 
