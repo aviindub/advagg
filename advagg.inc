@@ -604,49 +604,39 @@ function advagg_build_aggregate_plans($files_to_aggregate, $type) {
 }
 
 /**
- * Do a non blocking request of the aggregate if it does not exist.
+ * Create the aggregate if it does not exist; using HTTPRL if possible.
  *
  * @param $plans
  *   An array of aggregate file names.
  */
 function advagg_create_aggregate_files($plans) {
-  $urls = array();
   $filenames = array();
   foreach ($plans as $plan) {
     // Use cache here?
     if (!file_exists($plan['filepath'])) {
-      $urls[] = file_create_url($plan['data']);
       $filenames[] = $plan['filename'];
     }
   }
-  if (empty($urls)) {
+  if (empty($filenames)) {
     return;
   }
 
   // If the httprl module exists and we want to use it.
-  if (module_exists('httprl') && variable_get('advagg_use_httprl', ADVAGG_USE_HTTPRL)) {
-    // Set options for the requests.
-    $options = array(
-      'blocking' => FALSE,
-      'domain_connections' => 8,
-      'headers' => array('Accept-Encoding' => 'gzip, deflate'),
+  if (module_exists('httprl') && variable_get('advagg_use_httprl', ADVAGG_USE_HTTPRL) && httprl_is_background_callback_capable()) {
+    // Setup callback options array; call function in the background.
+    $callback_options = array(
+      array(
+        'function' => 'advagg_build_aggregates',
+      ),
+      $filenames,
     );
-    // Queue requests.
-    httprl_request($urls, $options);
-    // Execute requests.
-    httprl_send_request();
+    // Queue up the request.
+    httprl_queue_background_callback($callback_options);
+    // Execute request.
+    $return = httprl_send_request();
   }
   else {
-    // Otherwise call the file generation function directly.
-    module_load_include('inc', 'advagg', 'advagg.missing');
-    foreach ($filenames as $filename) {
-      // Only create the file if we have a lock.
-      $lock_name = 'advagg_' . $filename;
-      if (lock_acquire($lock_name, 10)) {
-        advagg_missing_create_file($filename);
-        lock_release($lock_name);
-      }
-    }
+    $return = advagg_build_aggregates($filenames);
   }
 }
 

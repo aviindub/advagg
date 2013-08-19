@@ -1483,6 +1483,29 @@ function advagg_get_root_files_dir() {
 }
 
 /**
+ * Builds the requested CSS/JS aggregates.
+ *
+ * @param $filenames
+ *   Array of AdvAgg filenames to generate.
+ * @return array
+ *   Array keyed by filename, value is result from advagg_missing_create_file().
+ */
+function advagg_build_aggregates($filenames) {
+  // Otherwise call the file generation function directly.
+  module_load_include('inc', 'advagg', 'advagg.missing');
+  $return = array();
+  foreach ($filenames as $filename) {
+    // Only create the file if we have a lock.
+    $lock_name = 'advagg_' . $filename;
+    if (lock_acquire($lock_name, 10)) {
+      $return[$filename] = advagg_missing_create_file($filename);
+      lock_release($lock_name);
+    }
+  }
+  return $return;
+}
+
+/**
  * Gets the core CSS/JS included in this ajax request.
  *
  * Used so core JS can be rendered through the AdvAgg pipeline.
