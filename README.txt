@@ -122,6 +122,49 @@ admin/config/development/performance/advagg/info
  * Hooks and variables used in hash. Show what is used to calculate the 3rd hash
    of an aggregates filename.
 
+Hidden Settings:
+The following settings are not configurable from the admin UI and must be set in
+settings.php. In general they are settings that should not be changed.
+
+    // Display a message that the bypass cookie is set.
+    $conf['advagg_show_bypass_cookie_message'] = TRUE;
+
+    // Skip the 404 check on status page.
+    $conf['advagg_skip_404_check'] = FALSE;
+
+    // Force the scripts #aggregate_callback to always be _advagg_aggregate_js.
+    $conf['advagg_enforce_scripts_callback'] = TRUE;
+
+    // Default location of AdvAgg configuration items.
+    $conf['advagg_admin_config_root_path'] = 'admin/config/development/performance';
+
+    // Set the jQuery UI version.
+    $conf['advagg_css_cdn_jquery_ui_version'] = '1.8.7';
+
+    // See if jQuery UI should be grabbed from the Google CDN.
+    $conf['advagg_css_cdn_jquery_ui'] = TRUE;
+
+    // Set the jQuery UI version.
+    $conf['advagg_js_cdn_jquery_ui_version'] = '1.8.7';
+
+    // Set the jQuery version.
+    $conf['advagg_js_cdn_jquery_version'] = '1.4.4';
+
+    // Use minification.
+    $conf['advagg_js_cdn_compression'] = TRUE;
+
+    // See if jQuery UI should be grabbed from the Google CDN.
+    $conf['advagg_js_cdn_jquery_ui'] = TRUE;
+
+    // See if jQuery should be grabbed from the Google CDN.
+    $conf['advagg_js_cdn_jquery'] = TRUE;
+
+    // Value for the compression ratio test.
+    $conf['advagg_js_max_compress_ratio'] = 0.9;
+
+    // Value for the compression ratio test.
+    $conf['advagg_js_compress_ratio'] = 0.1;
+
 
 JAVASCRIPT BOOKMARKLET
 ----------------------

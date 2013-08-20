@@ -76,6 +76,11 @@ define('ADVAGG_CSS_FIX_TYPE', TRUE);
  */
 define('ADVAGG_HTACCESS_CHECK_GENERATE', TRUE);
 
+/**
+ * Display a message that the bypass cookie is set.
+ */
+define('ADVAGG_SHOW_BYPASS_COOKIE_MESSAGE', TRUE);
+
 // Core hook implementations.
 /**
  * Implements hook_hook_info().
@@ -1252,7 +1257,7 @@ function advagg_enabled() {
 
       // Let the user know that the AdvAgg bypass cookie is currently set.
       static $msg_set;
-      if (!isset($msg_set)) {
+      if (!isset($msg_set) && variable_get('advagg_show_bypass_cookie_message', ADVAGG_SHOW_BYPASS_COOKIE_MESSAGE)) {
         $msg_set = TRUE;
         if (user_access('administer site configuration')) {
           drupal_set_message(t('The AdvAgg bypass cookie is currently enabled. Turn it off by going to the <a href="@advagg_operations">AdvAgg Operations</a> page and clicking the <em>Toggle the "aggregation bypass cookie" for this browser</em> button.', array(
