@@ -302,7 +302,6 @@ function advagg_update_7200(&$sandbox) {
   return t('Upgraded Advanced CSS/JS Aggregation to 7.x-2.x.');
 }
 
-
 /**
  * Implements hook_requirements().
  */
@@ -311,7 +310,26 @@ function advagg_requirements($phase) {
   // Ensure translations don't break at install time
   $t = get_t();
 
-  // Report Drupal version
+  // Always check these, independent of the current phase.
+  $function_list = array(
+    'rename',
+  );
+  // Check each function to make sure it exists.
+  foreach ($function_list as $function_name) {
+    if (!function_exists($function_name)) {
+      $requirements['advagg_function_' . $function_name] = array(
+        'title' => $t('Adv CSS/JS Agg - Function Disabled'),
+        'value' => $phase == 'install' ? FALSE : $function_name,
+        'severity' => REQUIREMENT_ERROR,
+        'description' => $t('<a href="!url">%name()</a> is disabled on this server. Please contact your hosting provider or server administrator and see if they can re-enable this function for you.', array(
+          '!url' => 'http://php.net/' . str_replace('_', '-', $function_name),
+          '%name' => $function_name,
+        )),
+      );
+    }
+  }
+
+  // Do the following checks only at runtime.
   if ($phase == 'runtime') {
     list($css_path, $js_path) = advagg_get_root_files_dir();
     $config_path = advagg_admin_config_root_path();
