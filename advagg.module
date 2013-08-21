@@ -934,6 +934,7 @@ function _advagg_process_html(&$variables) {
   }
   else {
     $js_cache = array();
+    $js_cache['scripts'] = '';
     $javascript = advagg_get_full_js($javascript);
     if (!empty($javascript)) {
       $scopes = advagg_get_js_scopes($javascript);
@@ -946,18 +947,23 @@ function _advagg_process_html(&$variables) {
         $scripts = advagg_get_js($scope, $javascript);
         // Header scripts.
         if ($scope == 'header') {
-          $variables['scripts'] = $scripts;
-          $js_cache['scripts'] = $scripts;
+          $variables['scripts'] = $scripts . $variables['scripts'];
+          $js_cache['scripts'] = $scripts . $js_cache['scripts'];
         }
         // Footer scripts.
-        elseif ($scope == 'footer') {
+        elseif ($scope == 'footer' && array_key_exists('page_bottom', $GLOBALS['theme_info']->info['regions'])) {
           $variables['page_bottom'] .= $scripts;
           $js_cache['page_bottom'] = $scripts;
         }
         // Scripts in other places.
-        elseif (isset($variables[$scope]) && is_string($variables[$scope])) {
+        elseif (isset($variables[$scope]) && is_string($variables[$scope]) && array_key_exists($scope, $GLOBALS['theme_info']->info['regions'])) {
           $variables[$scope] .= $scripts;
           $js_cache[$scope] = $scripts;
+        }
+        // Add javascript to scripts if we can't find the region in the theme.
+        else {
+          $variables['scripts'] .= $scripts;
+          $js_cache['scripts'] .= $scripts;
         }
       }
 
@@ -1243,6 +1249,11 @@ function advagg_enabled() {
     if (user_access('administer site configuration')) {
       drupal_set_message(t('Please run <a href="@link">database updates</a>. AdvAgg will remain disabled until done.', array('@link' => url('update.php'))), 'error');
     }
+  }
+
+  // Disable AdvAgg if maintenance mode is defined.
+  if (defined('MAINTENANCE_MODE')) {
+    $GLOBALS['conf']['advagg_enabled'] = FALSE;
   }
 
   // Only run code below if advagg is enabled.

@@ -113,7 +113,7 @@ function advagg_mod_js_alter(&$js) {
 
   // Move all JS to the footer.
   $move_js_to_footer = variable_get('advagg_mod_js_footer', ADVAGG_MOD_JS_FOOTER);
-  if (!empty($move_js_to_footer)) {
+  if (!empty($move_js_to_footer) && array_key_exists('page_bottom', $GLOBALS['theme_info']->info['regions'])) {
     foreach ($js as $name => &$values) {
       if ($move_js_to_footer == 1 && $values['group'] <= JS_LIBRARY) {
         continue;
