@@ -569,6 +569,16 @@ function advagg_install_check_via_http(&$requirements) {
             )),
           );
         }
+        elseif (!variable_get('clean_url', 0)) {
+          $requirements['advagg_clean_url'] = array(
+            'title' => $t('Adv CSS/JS Agg - Clean URLs'),
+            'value' => $t('HTTP requests to advagg for ' . $type . ' files are not getting through.'),
+            'severity' => REQUIREMENT_ERROR,
+            'description' => $t('Go to the <a href="@settings">clean URL settings page</a> and enable Clean URLs.', array(
+              '@settings' => url('admin/config/search/clean-urls'),
+            )),
+          );
+        }
         else {
           // Menu callback failed.
           $requirements['advagg_' . $type . '_generation'] = array(

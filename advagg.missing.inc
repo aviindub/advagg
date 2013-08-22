@@ -145,6 +145,9 @@ function advagg_missing_send_saved_file($files_to_save, $uri, $created, $type) {
     header("Content-Type: text/javascript; charset=UTF-8");
   }
 
+  // Send out a 200 OK status.
+  header($_SERVER['SERVER_PROTOCOL'] . " 200 OK");
+
   // Output file and exit.
   print $data;
   exit();
