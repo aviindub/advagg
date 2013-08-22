@@ -81,7 +81,30 @@ define('ADVAGG_HTACCESS_CHECK_GENERATE', TRUE);
  */
 define('ADVAGG_SHOW_BYPASS_COOKIE_MESSAGE', TRUE);
 
+/**
+ * Run advagg_url_inbound_alter().
+ */
+define('ADVAGG_URL_INBOUND_ALTER', TRUE);
+
 // Core hook implementations.
+/**
+ * Inbound URL rewrite helper
+ * If host includes subdomain, rewrite URI and internal path if necessary
+ */
+function advagg_url_inbound_alter(&$path, $original_path, $path_language) {
+  // Do nothing if this has been disabled.
+  if (!variable_get('advagg_url_inbound_alter', ADVAGG_URL_INBOUND_ALTER)) {
+    return;
+  }
+
+  // If requested path was for an advagg file but now it is something else
+  // switch is back to the requested path.
+  $request_path = request_path();
+  if ($path != $request_path && preg_match('/^.*\/advagg_(j|cs)s\/(j|cs)s' . ADVAGG_SPACE . '[A-Za-z0-9-_]{43}' . ADVAGG_SPACE . '[A-Za-z0-9-_]{43}' . ADVAGG_SPACE . '[A-Za-z0-9-_]{43}\.(j|cs)s.*$/', $request_path)) {
+    $path = $request_path;
+  }
+}
+
 /**
  * Implements hook_hook_info().
  */

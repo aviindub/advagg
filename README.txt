@@ -138,6 +138,9 @@ settings.php. In general they are settings that should not be changed.
     // Default location of AdvAgg configuration items.
     $conf['advagg_admin_config_root_path'] = 'admin/config/development/performance';
 
+    // Run advagg_url_inbound_alter().
+    $conf['advagg_url_inbound_alter'] = TRUE;
+
     // Set the jQuery UI version.
     $conf['advagg_css_cdn_jquery_ui_version'] = '1.8.7';
 
