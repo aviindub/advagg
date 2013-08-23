@@ -65,6 +65,12 @@ function advagg_mod_admin_settings_form() {
     '#default_value' => variable_get('advagg_mod_css_preprocess', ADVAGG_MOD_CSS_PREPROCESS),
     '#description' => module_exists('advagg_bundler') ? t('You might want to increase the <a href="@link">CSS Bundles Per Page</a> if this is checked.', array('@link' => url($config_path . '/advagg/bundler'))) : t(''),
   );
+  $form['css']['advagg_mod_css_translate'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Translate CSS content strings'),
+    '#default_value' => variable_get('advagg_mod_css_translate', ADVAGG_MOD_CSS_TRANSLATE),
+    '#description' => t('Run strings inside of quotes of the content attribute through the <a href="@t">t() function</a>.', array('@t' => 'https://api.drupal.org/api/drupal/includes!bootstrap.inc/function/t/7')),
+  );
 
   $form['landing_page'] = array(
     '#type' => 'fieldset',

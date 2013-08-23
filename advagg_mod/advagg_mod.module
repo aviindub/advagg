@@ -27,15 +27,19 @@ define('ADVAGG_MOD_JS_DEFER', FALSE);
 define('ADVAGG_MOD_JS_ASYNC_SHIM', TRUE);
 
 /**
+ * Default value to remove JavaScript if none was added on the page.
+ */
+define('ADVAGG_MOD_JS_REMOVE_UNUSED', FALSE);
+
+/**
  * Default value to turn on preprocessing for all CSS files.
  */
 define('ADVAGG_MOD_CSS_PREPROCESS', FALSE);
 
 /**
- * Default value to remove JavaScript if none was added on the page.
+ * Default value to tramslate the content attributes of CSS files.
  */
-define('ADVAGG_MOD_JS_REMOVE_UNUSED', FALSE);
-
+define('ADVAGG_MOD_CSS_TRANSLATE', FALSE);
 
 // Core hook implementations.
 /**
@@ -283,6 +287,15 @@ function advagg_mod_advagg_get_root_files_dir_alter(&$css_paths, &$js_paths) {
   $js_paths[1] = ltrim($js_paths[1]['path'], $GLOBALS['base_path']);
 }
 
+/**
+ * Implement hook_advagg_current_hooks_hash_array_alter().
+ */
+function advagg_mod_advagg_current_hooks_hash_array_alter(&$aggregate_settings) {
+  $aggregate_settings['variables']['advagg_mod_css_translate'] = variable_get('advagg_mod_css_translate', ADVAGG_MOD_CSS_TRANSLATE);
+  if (variable_get('advagg_mod_css_translate', ADVAGG_MOD_CSS_TRANSLATE)) {
+    $aggregate_settings['variables']['advagg_mod_css_translate_lang'] = isset($GLOBALS['language']->language) ? $GLOBALS['language']->language : 'en';
+  }
+}
 
 // Helper Functions.
 /**
