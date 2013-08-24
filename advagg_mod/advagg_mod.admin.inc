@@ -51,7 +51,7 @@ function advagg_mod_admin_settings_form() {
     '#type' => 'checkbox',
     '#title' => t('Remove unused JavaScript tags if possible'),
     '#default_value' => variable_get('advagg_mod_js_remove_unused', ADVAGG_MOD_JS_REMOVE_UNUSED),
-    '#description' => t('This is still experemental. Use with extreme caution. This will scan all included JS files for references to jquery and drupal. If none are found then the default JavaScript is removed from the page.'),
+    '#description' => t('This is still experimental. Use with extreme caution. This will scan all included JS files for references to jquery and drupal. If none are found then the default JavaScript is removed from the page.'),
   );
 
   $config_path = advagg_admin_config_root_path();
@@ -65,12 +65,23 @@ function advagg_mod_admin_settings_form() {
     '#default_value' => variable_get('advagg_mod_css_preprocess', ADVAGG_MOD_CSS_PREPROCESS),
     '#description' => module_exists('advagg_bundler') ? t('You might want to increase the <a href="@link">CSS Bundles Per Page</a> if this is checked.', array('@link' => url($config_path . '/advagg/bundler'))) : t(''),
   );
-  $form['css']['advagg_mod_css_translate'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Translate CSS content strings'),
-    '#default_value' => variable_get('advagg_mod_css_translate', ADVAGG_MOD_CSS_TRANSLATE),
-    '#description' => t('Run strings inside of quotes of the content attribute through the <a href="@t">t() function</a>.', array('@t' => 'https://api.drupal.org/api/drupal/includes!bootstrap.inc/function/t/7')),
-  );
+
+  // Only test the translate option if
+  //  the locale function is defined OR
+  //  the locale_custom_strings variable is not empty.
+  $locale_custom_strings = variable_get('locale_custom_strings_' . isset($GLOBALS['language']->language) ? $GLOBALS['language']->language : 'en', array());
+  if (function_exists('locale') || !empty($locale_custom_strings)) {
+    // Only show option if something comes back translated.
+    $files = advagg_mod_admin_test_css_file(advagg_mod_admin_get_file_list('css'));
+    if (!empty($files)) {
+      $form['css']['advagg_mod_css_translate'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Translate CSS content strings'),
+        '#default_value' => variable_get('advagg_mod_css_translate', ADVAGG_MOD_CSS_TRANSLATE),
+        '#description' => t('Run strings inside of quotes of the content attribute through the <a href="@t">t() function</a>.', array('@t' => 'https://api.drupal.org/api/drupal/includes!bootstrap.inc/function/t/7')),
+      );
+    }
+  }
 
   $form['landing_page'] = array(
     '#type' => 'fieldset',
@@ -151,4 +162,71 @@ function advagg_mod_admin_settings_form_submit($form, &$form_state) {
   foreach ($cache_bins as $bin) {
     cache_clear_all('*', $bin, TRUE);
   }
+}
+
+/**
+ * Test all CSS files seeing if any string translations do anything.
+ *
+ * @return
+ *   An array with the filename key and the before => after translation value.
+ */
+function advagg_mod_admin_test_css_files() {
+  $output = array();
+  // Get list of files.
+  $query_files = db_select('advagg_files', 'af')
+    ->fields('af', array('filename_hash', 'filename'))
+    ->condition('af.filetype', 'css')
+    ->orderBy('filename', 'DESC')
+    ->execute()
+    ->fetchAllKeyed();
+  $files = array_values($query_files);
+  // Exit if no files were found.
+  if (empty($files)) {
+    return $output;
+  }
+
+  foreach ($files as $filename) {
+    // Skip missing files.
+    if (!file_exists($filename)) {
+      continue;
+    }
+    // Load CSS file.
+    $file_contents = drupal_load_stylesheet_content(file_get_contents($filename), TRUE);
+
+    // Some code taken from drupal_load_stylesheet_content().
+
+    // Regexp to match double quoted strings.
+    $double_quot = '"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"';
+    // Regexp to match single quoted strings.
+    $single_quot = "'[^'\\\\]*(?:\\\\.[^'\\\\]*)*'";
+    // Extract all content inside of quotes.
+    $css_content_pattern = "/content:.*?($double_quot|$single_quot).*?(?:\\;|\\})/";
+
+    // Get strings inside of quotes of the content attribute.
+    preg_match_all($css_content_pattern, $file_contents, $matches);
+    // Skip if no matches.
+    if (empty($matches[1])) {
+      continue;
+    }
+
+    foreach ($matches[1] as $value) {
+      // Remove quotes for t function.
+      $before = substr($value, 1, -1);
+      // Only test if it contains A-Za-z.
+      if (!preg_match('/[A-Za-z]/', $before)) {
+        continue;
+      }
+      // Run t function.
+      $after = t($before);
+
+      // Only include it if strings are different.
+      if ($before !== $after) {
+        if (!isset($output[$filename])) {
+          $output[$filename] = '';
+        }
+        $output[$filename] .= $before . ' => ' . $after;
+      }
+    }
+  }
+  return $output;
 }

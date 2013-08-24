@@ -8,6 +8,8 @@
 /**
  * Implement hook_advagg_get_css_file_contents_alter().
  *
+ * @see drupal_load_stylesheet_content().
+ *
  * Used to run strings inside of quotes of the content attribute through the t
  * function.
  */
