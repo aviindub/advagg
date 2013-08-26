@@ -72,7 +72,7 @@ function advagg_mod_admin_settings_form() {
   $locale_custom_strings = variable_get('locale_custom_strings_' . isset($GLOBALS['language']->language) ? $GLOBALS['language']->language : 'en', array());
   if (function_exists('locale') || !empty($locale_custom_strings)) {
     // Only show option if something comes back translated.
-    $files = advagg_mod_admin_test_css_file(advagg_mod_admin_get_file_list('css'));
+    $files = advagg_mod_admin_test_css_files('css');
     if (!empty($files)) {
       $form['css']['advagg_mod_css_translate'] = array(
         '#type' => 'checkbox',
@@ -193,8 +193,7 @@ function advagg_mod_admin_test_css_files() {
     // Load CSS file.
     $file_contents = drupal_load_stylesheet_content(file_get_contents($filename), TRUE);
 
-    // Some code taken from drupal_load_stylesheet_content().
-
+    // Code taken from drupal_load_stylesheet_content().
     // Regexp to match double quoted strings.
     $double_quot = '"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"';
     // Regexp to match single quoted strings.
@@ -214,6 +213,12 @@ function advagg_mod_admin_test_css_files() {
       $before = substr($value, 1, -1);
       // Only test if it contains A-Za-z.
       if (!preg_match('/[A-Za-z]/', $before)) {
+        continue;
+      }
+      // Only test if it contains characters other than unicode.
+      $css_unicode_pattern = '/\\\\[0-9a-fA-F]{1,6}(?:\\r\\n|[ \\t\\r\\n\\f])?/';
+      $unicode_removed = preg_replace($css_unicode_pattern, '', $before);
+      if (empty($unicode_removed)) {
         continue;
       }
       // Run t function.

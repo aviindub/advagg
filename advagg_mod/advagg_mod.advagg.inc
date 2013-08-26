@@ -18,6 +18,7 @@ function advagg_mod_advagg_get_css_file_contents_alter(&$contents, $filename, $a
     return;
   }
 
+  // Code taken from drupal_load_stylesheet_content().
   // Regexp to match double quoted strings.
   $double_quot = '"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"';
   // Regexp to match single quoted strings.
@@ -41,6 +42,17 @@ function advagg_mod_advagg_get_css_file_contents_alter(&$contents, $filename, $a
 function advagg_mod_advagg_css_content_t_replace_callback($matches) {
   // Remove quotes for t function.
   $before = substr($matches[1], 1, -1);
+  // Only run if it contains A-Za-z.
+  if (!preg_match('/[A-Za-z]/', $before)) {
+    return $matches[0];
+  }
+  // Only run if it contains characters other than unicode.
+  $css_unicode_pattern = '/\\\\[0-9a-fA-F]{1,6}(?:\\r\\n|[ \\t\\r\\n\\f])?/';
+  $unicode_removed = preg_replace($css_unicode_pattern, '', $before);
+  if (empty($unicode_removed)) {
+    return $matches[0];
+  }
+
   // Run t function.
   $after = t($before);
   // Put back.
