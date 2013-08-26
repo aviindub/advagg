@@ -199,7 +199,7 @@ function advagg_mod_admin_test_css_files() {
     // Regexp to match single quoted strings.
     $single_quot = "'[^'\\\\]*(?:\\\\.[^'\\\\]*)*'";
     // Extract all content inside of quotes.
-    $css_content_pattern = "/content:.*?($double_quot|$single_quot).*?(?:\\;|\\})/";
+    $css_content_pattern = "/content:.*?($double_quot|$single_quot|(\\;|\\})).*?(?:\\;|\\})/";
 
     // Get strings inside of quotes of the content attribute.
     preg_match_all($css_content_pattern, $file_contents, $matches);
@@ -209,6 +209,10 @@ function advagg_mod_admin_test_css_files() {
     }
 
     foreach ($matches[1] as $value) {
+      // Skip if equal to ; or }.
+      if ($value == ';' || $value = '}') {
+        continue;
+      }
       // Remove quotes for t function.
       $before = substr($value, 1, -1);
       // Only test if it contains A-Za-z.

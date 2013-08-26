@@ -24,7 +24,7 @@ function advagg_mod_advagg_get_css_file_contents_alter(&$contents, $filename, $a
   // Regexp to match single quoted strings.
   $single_quot = "'[^'\\\\]*(?:\\\\.[^'\\\\]*)*'";
   // Extract all content inside of quotes.
-  $css_content_pattern = "/content:.*?($double_quot|$single_quot).*?(?:\\;|\\})/";
+  $css_content_pattern = "/content:.*?($double_quot|$single_quot|(?:\\;|\\})).*?(?:\\;|\\})/";
 
   // Run strings inside of quotes of the content attribute through the t
   // function.
@@ -40,6 +40,10 @@ function advagg_mod_advagg_get_css_file_contents_alter(&$contents, $filename, $a
  *   Replaced String.
  */
 function advagg_mod_advagg_css_content_t_replace_callback($matches) {
+  // Skip if equal to ; or }.
+  if ($matches[1] == ';' || $matches[1] = '}') {
+    return $matches[0];
+  }
   // Remove quotes for t function.
   $before = substr($matches[1], 1, -1);
   // Only run if it contains A-Za-z.
