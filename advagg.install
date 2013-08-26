@@ -522,11 +522,11 @@ function advagg_install_check_via_http(&$requirements) {
             ) {
 
         // Fast 404 check.
-        $parts = parse_url($url);
+        $url_path_404 = parse_url($url, PHP_URL_PATH);
         $exclude_paths = variable_get('404_fast_paths_exclude', FALSE);
         $fast_404_html = variable_get('404_fast_html', '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>The requested URL "@path" was not found on this server.</p></body></html>');
         // Replace @path in the variable with the page path.
-        $fast_404_html = trim(strtr($fast_404_html, array('@path' => check_plain($parts['path']))));
+        $fast_404_html = trim(strtr($fast_404_html, array('@path' => check_plain($url_path_404))));
         if ($fast_404_html == trim($request->data) && !empty($exclude_paths) && strpos($exclude_paths, 'advagg_') === FALSE) {
           if ($exclude_paths == '/\/(?:styles)\//') {
             $description = $t('Change it from <code>/\/(?:styles)\//</code> to <code>/\/(?:styles|advagg_(cs|j)s)\//</code> Current value: %value', array('%value' => $exclude_paths));
