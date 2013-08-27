@@ -53,6 +53,24 @@ function advagg_mod_admin_settings_form() {
     '#default_value' => variable_get('advagg_mod_js_remove_unused', ADVAGG_MOD_JS_REMOVE_UNUSED),
     '#description' => t('This is still experimental. Use with extreme caution. This will scan all included JS files for references to jquery and drupal. If none are found then the default JavaScript is removed from the page.'),
   );
+  $form['js']['advagg_mod_js_adjust_sort_external'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Move all external scripts to the top of the execution order'),
+    '#default_value' => variable_get('advagg_mod_js_adjust_sort_external', ADVAGG_MOD_JS_ADJUST_SORT_EXTERNAL),
+    '#description' => t('This is experimental. This will group all external JavaScript files to be above all other JavaScript.'),
+  );
+  $form['js']['advagg_mod_js_adjust_sort_inline'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Move all inline scripts to the bottom of the execution order'),
+    '#default_value' => variable_get('advagg_mod_js_adjust_sort_inline', ADVAGG_MOD_JS_ADJUST_SORT_INLINE),
+    '#description' => t('This is experimental. This will group all inline JavaScript to be below all other JavaScript.'),
+  );
+  $form['js']['advagg_mod_js_adjust_sort_browsers'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Move all browser conditional JavaScript to the bottom of the group'),
+    '#default_value' => variable_get('advagg_mod_js_adjust_sort_browsers', ADVAGG_MOD_JS_ADJUST_SORT_BROWSERS),
+    '#description' => t('This is experimental. This will group all browser conditional JavaScript to be in the lowest group of that conditional rule.'),
+  );
 
   $config_path = advagg_admin_config_root_path();
   $form['css'] = array(
@@ -65,7 +83,6 @@ function advagg_mod_admin_settings_form() {
     '#default_value' => variable_get('advagg_mod_css_preprocess', ADVAGG_MOD_CSS_PREPROCESS),
     '#description' => module_exists('advagg_bundler') ? t('You might want to increase the <a href="@link">CSS Bundles Per Page</a> if this is checked.', array('@link' => url($config_path . '/advagg/bundler'))) : t(''),
   );
-
   // Only test the translate option if
   //  the locale function is defined OR
   //  the locale_custom_strings variable is not empty.
@@ -82,6 +99,24 @@ function advagg_mod_admin_settings_form() {
       );
     }
   }
+  $form['css']['advagg_mod_css_adjust_sort_external'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Move all external CSS to the top of the execution order'),
+    '#default_value' => variable_get('advagg_mod_css_adjust_sort_external', ADVAGG_MOD_CSS_ADJUST_SORT_EXTERNAL),
+    '#description' => t('This is experimental. This will group all external CSS files to be above all other CSS.'),
+  );
+  $form['css']['advagg_mod_css_adjust_sort_inline'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Move all inline CSS to the bottom of the execution order'),
+    '#default_value' => variable_get('advagg_mod_css_adjust_sort_inline', ADVAGG_MOD_CSS_ADJUST_SORT_INLINE),
+    '#description' => t('This is experimental. This will group all inline CSS to be below all other CSS.'),
+  );
+  $form['css']['advagg_mod_css_adjust_sort_browsers'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Move all browser conditional CSS to the bottom of the group'),
+    '#default_value' => variable_get('advagg_mod_css_adjust_sort_browsers', ADVAGG_MOD_CSS_ADJUST_SORT_BROWSERS),
+    '#description' => t('This is experimental. This will group all browser conditional CSS to be in the lowest group of that conditional rule.'),
+  );
 
   $form['landing_page'] = array(
     '#type' => 'fieldset',

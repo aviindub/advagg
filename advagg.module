@@ -145,11 +145,16 @@ function advagg_module_implements_alter(&$implementations, $hook) {
     $implementations['advagg'] = $item;
   }
 
-  // Move advagg to the bottom.
+  // Move advagg & advagg_mod to the bottom, but advagg is above advagg_mod.
   if ($hook === 'js_alter' && array_key_exists('advagg', $implementations)) {
     $item = $implementations['advagg'];
     unset($implementations['advagg']);
     $implementations['advagg'] = $item;
+    if (array_key_exists('advagg_mod', $implementations)) {
+      $item = $implementations['advagg_mod'];
+      unset($implementations['advagg_mod']);
+      $implementations['advagg_mod'] = $item;
+    }
   }
 
   // Move advagg to the bottom.

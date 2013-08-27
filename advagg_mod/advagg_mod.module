@@ -41,6 +41,36 @@ define('ADVAGG_MOD_CSS_PREPROCESS', FALSE);
  */
 define('ADVAGG_MOD_CSS_TRANSLATE', FALSE);
 
+/**
+ * Default value to adjust the sorting of external JavaScript.
+ */
+define('ADVAGG_MOD_JS_ADJUST_SORT_EXTERNAL', FALSE);
+
+/**
+ * Default value to adjust the sorting of inline JavaScript.
+ */
+define('ADVAGG_MOD_JS_ADJUST_SORT_INLINE', FALSE);
+
+/**
+ * Default value to adjust the sorting of browser conditional JavaScript.
+ */
+define('ADVAGG_MOD_JS_ADJUST_SORT_BROWSERS', FALSE);
+
+/**
+ * Default value to adjust the sorting of external CSS.
+ */
+define('ADVAGG_MOD_CSS_ADJUST_SORT_EXTERNAL', FALSE);
+
+/**
+ * Default value to adjust the sorting of inline CSS.
+ */
+define('ADVAGG_MOD_CSS_ADJUST_SORT_INLINE', FALSE);
+
+/**
+ * Default value to adjust the sorting of browser conditional CSS.
+ */
+define('ADVAGG_MOD_CSS_ADJUST_SORT_BROWSERS', FALSE);
+
 // Core hook implementations.
 /**
  * Implement hook_init().
@@ -115,6 +145,14 @@ function advagg_mod_js_alter(&$js) {
     advagg_remove_js_if_not_used($js);
   }
 
+  // Change sort order so aggregates do not get split up.
+  if (   variable_get('advagg_mod_js_adjust_sort_external', ADVAGG_MOD_JS_ADJUST_SORT_EXTERNAL)
+      || variable_get('advagg_mod_js_adjust_sort_inline', ADVAGG_MOD_JS_ADJUST_SORT_INLINE)
+      || variable_get('advagg_mod_js_adjust_sort_browsers', ADVAGG_MOD_JS_ADJUST_SORT_BROWSERS)
+        ) {
+    advagg_mod_sort_css_js($js, 'js');
+  }
+
   // Move all JS to the footer.
   $move_js_to_footer = variable_get('advagg_mod_js_footer', ADVAGG_MOD_JS_FOOTER);
   if (!empty($move_js_to_footer) && array_key_exists('page_bottom', $GLOBALS['theme_info']->info['regions'])) {
@@ -182,12 +220,186 @@ function advagg_mod_js_alter(&$js) {
   }
 }
 
+function advagg_mod_sort_css_js(&$array, $type) {
+  if (   ($type == 'js' && variable_get('advagg_mod_js_adjust_sort_external', ADVAGG_MOD_JS_ADJUST_SORT_EXTERNAL))
+      || ($type == 'css' && variable_get('advagg_mod_css_adjust_sort_external', ADVAGG_MOD_CSS_ADJUST_SORT_EXTERNAL))
+        ) {
+    // Find all external items.
+    $external = array();
+    $group = NULL;
+    $every_page = NULL;
+    $weight = NULL;
+    foreach ($array as $key => $value) {
+      // Set values if not set.
+      if (is_null($group)) {
+        $group = $value['group'];
+      }
+      if (is_null($every_page)) {
+        $every_page = $value['every_page'];
+      }
+      if (is_null($weight)) {
+        $weight = $value['weight'];
+      }
+
+      // Find "lightest" item.
+      if ($value['group'] < $group) {
+        $group = $value['group'];
+      }
+      if ($value['every_page'] && !$every_page) {
+        $every_page = $value['every_page'];
+      }
+      if ($value['weight'] < $weight) {
+        $weight = $value['weight'];
+      }
+
+      if (!empty($value['type']) && $value['type'] == 'external') {
+        $external[$key] = $value;
+        unset($array[$key]);
+      }
+    }
+    // Sort the array so that it appears in the correct order.
+    uasort($external, 'drupal_sort_css_js');
+
+    // Group all external together.
+    $offset = 0.0001;
+    foreach ($external as $key => $value) {
+      $value['group'] = $group;
+      $value['every_page'] = $every_page;
+      $value['weight'] = $weight;
+      $weight += $offset;
+      $array[$key] = $value;
+    }
+  }
+
+  if (   ($type == 'js' && variable_get('advagg_mod_js_adjust_sort_inline', ADVAGG_MOD_JS_ADJUST_SORT_INLINE))
+      || ($type == 'css' && variable_get('advagg_mod_css_adjust_sort_inline', ADVAGG_MOD_CSS_ADJUST_SORT_INLINE))
+        ) {
+    // Find all inline items.
+    $inline = array();
+    $group = NULL;
+    $every_page = NULL;
+    $weight = NULL;
+    foreach ($array as $key => $value) {
+      // Set values if not set.
+      if (is_null($group)) {
+        $group = $value['group'];
+      }
+      if (is_null($every_page)) {
+        $every_page = $value['every_page'];
+      }
+      if (is_null($weight)) {
+        $weight = $value['weight'];
+      }
+
+      // Find "heaviest" item.
+      if ($value['group'] > $group) {
+        $group = $value['group'];
+      }
+      if (!$value['every_page'] && $every_page) {
+        $every_page = $value['every_page'];
+      }
+      if ($value['weight'] > $weight) {
+        $weight = $value['weight'];
+      }
+
+      if (!empty($value['type']) && $value['type'] == 'inline') {
+        $inline[$key] = $value;
+        unset($array[$key]);
+      }
+    }
+    // Sort the array so that it appears in the correct order.
+    uasort($inline, 'drupal_sort_css_js');
+
+    // Group all inline together.
+    $offset = 0.0001;
+    foreach ($inline as $key => $value) {
+      $value['group'] = $group;
+      $value['every_page'] = $every_page;
+      $value['weight'] = $weight;
+      $weight += $offset;
+      $array[$key] = $value;
+    }
+  }
+
+  if (   ($type == 'js' && variable_get('advagg_mod_js_adjust_sort_browsers', ADVAGG_MOD_JS_ADJUST_SORT_BROWSERS))
+      || ($type == 'css' && variable_get('advagg_mod_css_adjust_sort_browsers', ADVAGG_MOD_CSS_ADJUST_SORT_BROWSERS))
+        ) {
+    // Get a list of browsers.
+    $browsers_list = array();
+    foreach ($array as $key => $value) {
+      if (isset($value['browsers']['IE']) && $value['browsers']['IE'] !== TRUE) {
+        $browsers_list['IE'][] = $value['browsers']['IE'];
+      }
+    }
+
+    // Group browsers CSS together.
+    if (isset($browsers_list['IE'])) {
+      $browsers_list['IE'] = array_values(array_unique($browsers_list['IE']));
+      foreach ($browsers_list['IE'] as $browser) {
+        $browsers = array();
+        $group = NULL;
+        $every_page = NULL;
+        $weight = NULL;
+        foreach ($array as $key => $value) {
+          if (isset($value['browsers']['IE']) && $browser === $value['browsers']['IE']) {
+            // Set values if not set.
+            if (is_null($group)) {
+              $group = $value['group'];
+            }
+            if (is_null($every_page)) {
+              $every_page = $value['every_page'];
+            }
+            if (is_null($weight)) {
+              $weight = $value['weight'];
+            }
+
+            // Find "heaviest" item.
+            if ($value['group'] > $group) {
+              $group = $value['group'];
+            }
+            if (!$value['every_page'] && $every_page) {
+              $every_page = $value['every_page'];
+            }
+            if ($value['weight'] > $weight) {
+              $weight = $value['weight'];
+            }
+
+            $browsers[$key] = $value;
+            unset($array[$key]);
+          }
+        }
+
+        // Sort the array so that it appears in the correct order.
+        uasort($browsers, 'drupal_sort_css_js');
+
+        // Group all external together.
+        $offset = 0.0001;
+        foreach ($browsers as $key => $value) {
+          $value['group'] = $group;
+          $value['every_page'] = $every_page;
+          $value['weight'] = $weight;
+          $weight += $offset;
+          $array[$key] = $value;
+        }
+      }
+    }
+  }
+}
+
 /**
  * Implements hook_css_alter().
  */
 function advagg_mod_css_alter(&$css) {
   if (module_exists('advagg') && !advagg_enabled()) {
     return;
+  }
+
+  // Change sort order so aggregates do not get split up.
+  if (   variable_get('advagg_mod_css_adjust_sort_external', ADVAGG_MOD_CSS_ADJUST_SORT_EXTERNAL)
+      || variable_get('advagg_mod_css_adjust_sort_inline', ADVAGG_MOD_CSS_ADJUST_SORT_INLINE)
+      || variable_get('advagg_mod_css_adjust_sort_browsers', ADVAGG_MOD_CSS_ADJUST_SORT_BROWSERS)
+        ) {
+    advagg_mod_sort_css_js($css, 'css');
   }
 
   // Do not use preprocessing if CSS is inlined.
