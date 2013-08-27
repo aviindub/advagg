@@ -57,6 +57,13 @@ function advagg_js_cdn_js_alter(&$javascript) {
         && $name == 'misc/jquery.js'
         && $javascript[$name]['type'] == 'file'
           ) {
+      // Add in backup.
+      $values['weight'] += 0.00001;
+      $values['data'] = 'window.jQuery || document.write("<script src=\'' . base_path() . $values['data'] . '\'>\x3C/script>")';
+      $values['type'] = 'inline';
+      $javascript[$name . 'backup.js'] = $values;
+
+      // Change core to external.
       $javascript[$name]['data'] = '//ajax.googleapis.com/ajax/libs/jquery/'. $jquery_version . '/jquery' . $min . '.js';
       $javascript[$name]['type'] = 'external';
     }
@@ -71,6 +78,13 @@ function advagg_js_cdn_js_alter(&$javascript) {
           ) {
       // We only need one file
       if (!$add_in_ui) {
+        // Add in backup.
+        $values['weight'] += 0.00001;
+        $values['data'] = 'window.jQuery || document.write("<script src=\'' . base_path() .   drupal_get_path('module', 'advagg_js_cdn') . '/js/jquery-ui.js' . '\'>\x3C/script>")';
+        $values['type'] = 'inline';
+        $javascript[$name . 'backup.js'] = $values;
+
+        // Change core to external.
         $add_in_ui = TRUE;
         $javascript[$name]['data'] = '//ajax.googleapis.com/ajax/libs/jqueryui/'. $jquery_ui_version . '/jquery-ui' . $min . '.js';
         $javascript[$name]['type'] = 'external';

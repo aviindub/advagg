@@ -256,6 +256,19 @@ function advagg_mod_sort_css_js(&$array, $type) {
         $external[$key] = $value;
         unset($array[$key]);
       }
+
+      if (!empty($value['type']) && $value['type'] == 'inline') {
+        // Move jQuery fallback as well.
+        if (strpos($value['data'], 'window.jQuery') === 0) {
+          $external[$key] = $value;
+          unset($array[$key]);
+        }
+        // Move jQuery ui fallback as well.
+        if (strpos($value['data'], 'window.jQuery.ui') === 0) {
+          $external[$key] = $value;
+          unset($array[$key]);
+        }
+      }
     }
     // Sort the array so that it appears in the correct order.
     uasort($external, 'drupal_sort_css_js');
@@ -303,6 +316,14 @@ function advagg_mod_sort_css_js(&$array, $type) {
       }
 
       if (!empty($value['type']) && $value['type'] == 'inline') {
+        // Do not move jQuery fallback.
+        if (strpos($value['data'], 'window.jQuery') === 0) {
+          continue;
+        }
+        // Do not move jQuery.ui fallback.
+        if (strpos($value['data'], 'window.jQuery.ui') === 0) {
+          continue;
+        }
         $inline[$key] = $value;
         unset($array[$key]);
       }
