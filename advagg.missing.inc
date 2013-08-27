@@ -58,6 +58,7 @@ function advagg_missing_generate() {
     }
     else {
       list($files_to_save, $type) = $return;
+      $created = TRUE;
     }
   }
   else {
@@ -66,12 +67,16 @@ function advagg_missing_generate() {
     // be available in menu_execute_active_handler() resulting in a 404.
     lock_wait($lock_name, 10);
     if (file_exists($uri) && filesize($uri) > 0) {
-      $created = TRUE;
+      $data = advagg_get_hashes_from_filename($filename);
+      if (is_array($data)) {
+        $type = $data[0];
+        $created = TRUE;
+      }
     }
   }
 
   // Redirect and try again on failure.
-  if (empty($files_to_save) && empty($created)) {
+  if (empty($created)) {
     $redirect_counter++;
     $uri .= '?redirect_counter=' . $redirect_counter;
     header('Location: ' . $uri, TRUE, 307);
