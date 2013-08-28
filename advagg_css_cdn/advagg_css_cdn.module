@@ -41,6 +41,8 @@ function advagg_css_cdn_css_alter(&$css) {
           ) {
       $css[$name]['data'] = '//ajax.googleapis.com/ajax/libs/jqueryui/'. $jquery_ui_version . '/themes/base/jquery.' . $ui_mapping[$name] . '.css';
       $css[$name]['type'] = 'external';
+
+      // Fallback can not work do to "SecurityError: The operation is insecure."
     }
   }
 }

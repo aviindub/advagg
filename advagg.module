@@ -509,13 +509,13 @@ function advagg_css_alter(&$css) {
       continue;
     }
 
-    // If type is external but doesn't start with http, change it to file.
-    if ($value['type'] == 'external' && stripos($value['data'], 'http://') !== 0 && stripos($value['data'], 'https://') !== 0) {
+    // If type is external but doesn't start with http or //, change it to file.
+    if ($value['type'] == 'external' && stripos($value['data'], 'http://') !== 0 && stripos($value['data'], 'https://') !== 0 && stripos($value['data'], '//') !== 0) {
       $value['type'] = 'file';
     }
 
-    // If type is file but it starts with http, change it to external.
-    if ((stripos($value['data'], 'http://') === 0 || stripos($value['data'], 'https://') === 0) && $value['type'] == 'file') {
+    // If type is file but it starts with http or //, change it to external.
+    if ((stripos($value['data'], 'http://') === 0 || stripos($value['data'], 'https://') === 0 || stripos($value['data'], '//') === 0) && $value['type'] == 'file') {
       $value['type'] = 'external';
     }
   }
