@@ -87,9 +87,9 @@ function advagg_missing_generate() {
     watchdog('advagg', 'One of the alter hooks failed when generating this file: %uri. Thus this file was created without any alter hooks.', array('%uri' => $uri), WATCHDOG_CRITICAL);
   }
 
-  // Output file's contents if createing the file was sucessfull.
+  // Output file's contents if creating the file was sucessfull.
   // This function will call exit.
-  advagg_missing_send_saved_file($files_to_save, $uri, $created, $type);
+  advagg_missing_send_saved_file($files_to_save, $uri, $created, $type, $redirect_counter);
 }
 
 /**
@@ -104,7 +104,7 @@ function advagg_missing_generate() {
  * @param $type
  *   css or js
  */
-function advagg_missing_send_saved_file($files_to_save, $uri, $created, $type) {
+function advagg_missing_send_saved_file($files_to_save, $uri, $created, $type, $redirect_counter) {
   // Negotiate whether to use gzip compression.
   $return_compressed = isset($_SERVER['HTTP_ACCEPT_ENCODING']) && strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== FALSE;
   header('Vary: Accept-Encoding', FALSE);
@@ -113,7 +113,9 @@ function advagg_missing_send_saved_file($files_to_save, $uri, $created, $type) {
     if ($return_compressed && file_exists($uri . '.gz') && filesize($uri . '.gz') > 0) {
       $uri .= '.gz';
     }
-    $files_to_save[$uri] = file_get_contents($uri);
+    if (!isset($files_to_save[$uri]) && file_exists($uri) && filesize($uri)) {
+      $files_to_save[$uri] = file_get_contents($uri);
+    }
   }
 
   // Make sure zlib.output_compression does not compress the output.
@@ -143,19 +145,28 @@ function advagg_missing_send_saved_file($files_to_save, $uri, $created, $type) {
   else {
     $data = reset($files_to_save);
   }
-  if ($type == 'css') {
-    header("Content-Type: text/css");
-  }
-  elseif ($type == 'js') {
-    header("Content-Type: text/javascript; charset=UTF-8");
-  }
-
-  // Send out a 200 OK status.
-  header($_SERVER['SERVER_PROTOCOL'] . " 200 OK");
 
   // Output file and exit.
-  print $data;
-  exit();
+  if (!empty($data)) {
+    // Send out a 200 OK status.
+    header($_SERVER['SERVER_PROTOCOL'] . " 200 OK");
+    if ($type == 'css') {
+      header("Content-Type: text/css");
+    }
+    elseif ($type == 'js') {
+      header("Content-Type: text/javascript; charset=UTF-8");
+    }
+
+    print $data;
+    exit();
+  }
+  else {
+    // Redirect and try again on failure.
+    $redirect_counter++;
+    $uri .= '?redirect_counter=' . $redirect_counter;
+    header('Location: ' . $uri, TRUE, 307);
+    exit();
+  }
 }
 
 /**

@@ -49,7 +49,7 @@ define('ADVAGG_COMBINE_CSS_MEDIA', FALSE);
 /**
  * Prevent more than 4095 css selector rules inside of a CSS aggregate.
  */
-define('ADVAGG_IE_CSS_SELECTOR_LIMITER', TRUE);
+define('ADVAGG_IE_CSS_SELECTOR_LIMITER', FALSE);
 
 /**
  * Default location of AdvAgg configuration items.
@@ -964,6 +964,7 @@ function _advagg_process_html(&$variables) {
     $js_cache = array();
     $js_cache['scripts'] = '';
     $javascript = advagg_get_full_js($javascript);
+    uasort($javascript, 'drupal_sort_css_js');
     if (!empty($javascript)) {
       $scopes = advagg_get_js_scopes($javascript);
 
@@ -979,7 +980,7 @@ function _advagg_process_html(&$variables) {
           $js_cache['scripts'] = $scripts . $js_cache['scripts'];
         }
         // Footer scripts.
-        elseif ($scope == 'footer' && array_key_exists('page_bottom', $GLOBALS['theme_info']->info['regions'])) {
+        elseif ($scope == 'footer') {
           $variables['page_bottom'] .= $scripts;
           $js_cache['page_bottom'] = $scripts;
         }
