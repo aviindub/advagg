@@ -35,7 +35,7 @@ function advagg_admin_settings_form($form, $form_state) {
   $form['global']['advagg_core_groups'] = array(
     '#type' => 'checkbox',
     '#title' => t('Use cores grouping logic'),
-    '#default_value' => variable_get('advagg_core_groups', ADVAGG_CORE_GROUPS),
+    '#default_value' => variable_get('advagg_combine_css_media', ADVAGG_COMBINE_CSS_MEDIA) || variable_get('advagg_ie_css_selector_limiter', ADVAGG_IE_CSS_SELECTOR_LIMITER) ? FALSE : variable_get('advagg_core_groups', ADVAGG_CORE_GROUPS),
     '#description' => t('Will group files just like core does.'),
     '#states' => array(
       'enabled' => array(
