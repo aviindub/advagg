@@ -115,6 +115,7 @@ function advagg_missing_send_saved_file($files_to_save, $uri, $created, $type, $
     }
     if (!isset($files_to_save[$uri]) && file_exists($uri) && filesize($uri)) {
       $files_to_save[$uri] = file_get_contents($uri);
+      header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', filemtime($uri)));
     }
   }
 
@@ -634,6 +635,9 @@ function advagg_save_aggregate($filename, $files, $type, $aggregate_settings) {
     advagg_save_data($uri, $data);
     if (!file_exists($uri) || filesize($uri) == 0) {
       watchdog('advagg', 'Write to file system failed. %uri', array('%uri' => $uri), WATCHDOG_EMERGENCY);
+    }
+    else {
+      header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', filemtime($uri)));
     }
   }
   return $files_to_save;
