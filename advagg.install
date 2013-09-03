@@ -458,6 +458,39 @@ function advagg_requirements($phase) {
       }
     }
 
+    // Check that https is correct.
+    if (  empty($GLOBALS['is_https']) &&
+          (  (isset($_SERVER['HTTPS']) &&  strtolower($_SERVER['HTTPS']) == 'on')
+          || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
+          || (isset($_SERVER['HTTP_HTTPS']) && $_SERVER['HTTP_HTTPS'] == 'on')
+            )
+        ) {
+        $requirements['advagg_is_https_check'] = array(
+          'title' => $t('Adv CSS/JS Agg - HTTPS'),
+          'severity' => REQUIREMENT_WARNING,
+          'value' => $t('The core global $is_https is not TRUE.'),
+          'description' => $t('You need to add in this logic near the top your settings.php file: <pre>@code</pre>', array(
+            '@code' => 'if ( (isset($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on")
+  || (isset($_SERVER["HTTP_X_FORWARDED_PROTO"]) && $_SERVER["HTTP_X_FORWARDED_PROTO"] == "https")
+  || (isset($_SERVER["HTTP_HTTPS"]) && $_SERVER["HTTP_HTTPS"] == "on")
+    ) {
+  $_SERVER["HTTPS"] = "on";
+}')));
+    }
+
+    // Make sure $base_url is correct.
+    if (!empty($GLOBALS['is_https']) && strpos($GLOBALS['base_url'], 'https://') !== 0) {
+        $requirements['advagg_is_https_check'] = array(
+          'title' => $t('Adv CSS/JS Agg - HTTPS'),
+          'severity' => REQUIREMENT_WARNING,
+          'value' => $t('The core global $base_url\'s scheme is incorrect.'),
+          'description' => $t('You need to add in this logic near the bottom of your settings.php file: <pre>@code</pre>', array(
+            '@code' => 'if (isset($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on" && isset($base_url)) {
+  $base_url = str_replace("http://", "https://", $base_url);
+}
+')));
+    }
+
     // Make sure http requests will work correctly.
     advagg_install_check_via_http($requirements);
 

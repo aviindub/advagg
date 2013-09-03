@@ -1143,7 +1143,7 @@ function advagg_get_js($scope = 'header', $javascript = NULL, $skip_alter = FALS
   // Aurora & Omega themes uses alter without checking previous value.
   if (variable_get('advagg_enforce_scripts_callback', TRUE)) {
     $element_info = &drupal_static('element_info');
-    if ($element_info['scripts']['#aggregate_callback'] != '_advagg_aggregate_js') {
+    if (empty($element_info['scripts']) || $element_info['scripts']['#aggregate_callback'] != '_advagg_aggregate_js') {
       advagg_element_info_alter($element_info);
     }
   }
