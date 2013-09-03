@@ -1488,6 +1488,8 @@ function advagg_get_hash_settings($hash) {
 /**
  * Get the CSS & JS path for advagg.
  *
+ * @param $reset
+ *   Set to TRUE to reset the static variables.
  * @return
  *   Example below:
  *   array(
@@ -1501,12 +1503,12 @@ function advagg_get_hash_settings($hash) {
  *     ),
  *   )
  */
-function advagg_get_root_files_dir() {
+function advagg_get_root_files_dir($reset = FALSE) {
   $css_paths = &drupal_static(__FUNCTION__ . '_css');
   $js_paths = &drupal_static(__FUNCTION__ . '_js');
 
   // Make sure directories are available and writable.
-  if (empty($css_paths) || empty($js_paths)) {
+  if (empty($css_paths) || empty($js_paths) || $reset) {
     $css_paths[0] = 'public://advagg_css';
     $js_paths[0] = 'public://advagg_js';
 

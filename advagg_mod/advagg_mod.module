@@ -78,7 +78,7 @@ define('ADVAGG_MOD_CSS_ADJUST_SORT_BROWSERS', FALSE);
 function advagg_mod_init() {
   // Return if unified_multisite_dir is not set.
   $dir = rtrim(variable_get('advagg_mod_unified_multisite_dir', ''), '/');
-  if (empty($dir) || !file_exists($dir) || !is_dir($dir)){
+  if (empty($dir) || !file_exists($dir) || !is_dir($dir)) {
     return;
   }
 
