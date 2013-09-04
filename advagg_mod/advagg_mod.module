@@ -37,7 +37,7 @@ define('ADVAGG_MOD_JS_REMOVE_UNUSED', FALSE);
 define('ADVAGG_MOD_CSS_PREPROCESS', FALSE);
 
 /**
- * Default value to tramslate the content attributes of CSS files.
+ * Default value to translate the content attributes of CSS files.
  */
 define('ADVAGG_MOD_CSS_TRANSLATE', FALSE);
 
@@ -835,7 +835,7 @@ function advagg_remove_js_if_not_used(&$js) {
 function advagg_mod_magic($magic_settings, $theme) {
   $settings = array();
 
-  // If possible disable access and set defult to false.
+  // If possible disable access and set default to false.
   if (!isset($magic_settings['css']['magic_embedded_mqs']['#access'])) {
     $settings['css']['magic_embedded_mqs']['#access'] = FALSE;
   }
@@ -868,7 +868,7 @@ function advagg_mod_magic($magic_settings, $theme) {
 }
 
 /**
- * Form validation handler. Disable certian magic settings before being saved.
+ * Form validation handler. Disable certain magic settings before being saved.
  */
 function advagg_mod_magic_form_validate($form, &$form_state) {
   // Disable magic functionality if it is a duplicate of AdvAgg.

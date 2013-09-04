@@ -786,8 +786,8 @@ function advagg_install_check_via_http(&$requirements) {
         $requirements['advagg_' . $type . '_type'] = array(
           'title' => $t('Adv CSS/JS Agg - Content-Type'),
           'severity' => REQUIREMENT_WARNING,
-          'value' => $t('The wrong Content-Type is being sent by your webserver.', array('%type' => $type)),
-          'description' => $t('The web servers configuration will need to be adjusted. Was looking for <code>@typematch</code>, actaully got <code>@received</code>. You might need to apply the drupal core patch located here <a href="@url">@url</a>.', array(
+          'value' => $t('The wrong Content-Type is being sent by your web server.', array('%type' => $type)),
+          'description' => $t('The web servers configuration will need to be adjusted. Was looking for <code>@typematch</code>, actually got <code>@received</code>. You might need to apply the drupal core patch located here <a href="@url">@url</a>.', array(
             '@url' => 'https://drupal.org/node/1440534',
             '@typematch' => 'text/' . $content_type,
             '@received' => isset($request->headers['content-type']) ? $request->headers['content-type'] : 'NULL',
@@ -808,8 +808,8 @@ function advagg_install_check_via_http(&$requirements) {
           $requirements['advagg_' . $type . '_expires'] = array(
             'title' => $t('Adv CSS/JS Agg - Expires'),
             'severity' => REQUIREMENT_WARNING,
-            'value' => $t('The expires header being sent by your webserver is not at least 1 year in the future.', array('%type' => $type)),
-            'description' => $t('The web servers configuration should be adjusted only for AdvAgg files. Was looking for a second counter over 31,536,000 (1 year), actaully got <code>@received</code>.', array(
+            'value' => $t('The expires header being sent by your web server is not at least 1 year in the future.', array('%type' => $type)),
+            'description' => $t('The web servers configuration should be adjusted only for AdvAgg files. Was looking for a second counter over 31,536,000 (1 year), actually got <code>@received</code>.', array(
               '@received' => isset($request->headers['expires']) ? number_format(strtotime($request->headers['expires'])) : 'NULL',
             )),
           );
@@ -827,8 +827,8 @@ function advagg_install_check_via_http(&$requirements) {
           $requirements['advagg_' . $type . '_cache_control'] = array(
             'title' => $t('Adv CSS/JS Agg - Cache-Control'),
             'severity' => REQUIREMENT_WARNING,
-            'value' => $t("The cache-control's mag-age header being sent by your webserver is not at least 1 year in the future.", array('%type' => $type)),
-            'description' => $t('The web servers configuration should be adjusted only for AdvAgg files. Was looking that the max-age second counter is over 31,536,000 (1 year), actaully got <code>@received</code>.', array(
+            'value' => $t("The cache-control's max-age header being sent by your web server is not at least 1 year in the future.", array('%type' => $type)),
+            'description' => $t('The web servers configuration should be adjusted only for AdvAgg files. Was looking that the max-age second counter is over 31,536,000 (1 year), actually got <code>@received</code>.', array(
               '@received' => isset($request->headers['cache-control']) ? $request->headers['cache-control'] : 'NULL',
             )),
           );
@@ -862,7 +862,7 @@ function advagg_install_check_via_http(&$requirements) {
         $requirements['advagg_' . $type . '_304'] = array(
           'title' => $t('Adv CSS/JS Agg - If-Modified-Since'),
           'severity' => REQUIREMENT_WARNING,
-          'value' => $t('The If-Modified-Since header is being ignored by your webserver.'),
+          'value' => $t('The If-Modified-Since header is being ignored by your web server.'),
           'description' => $t('The web servers configuration will need to be adjusted. The server should have responded with a 304, instead a @code was returned.', array('@code' => $request->code)),
         );
       }

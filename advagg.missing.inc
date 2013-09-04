@@ -87,7 +87,7 @@ function advagg_missing_generate() {
     watchdog('advagg', 'One of the alter hooks failed when generating this file: %uri. Thus this file was created without any alter hooks.', array('%uri' => $uri), WATCHDOG_CRITICAL);
   }
 
-  // Output file's contents if creating the file was sucessfull.
+  // Output file's contents if creating the file was successful.
   // This function will call exit.
   advagg_missing_send_saved_file($files_to_save, $uri, $created, $type, $redirect_counter);
 }
@@ -213,7 +213,7 @@ function advagg_missing_set_farfuture_headers() {
  * @param $filename
  *   Just the filename no path information.
  * @param $no_alters
- *   Set to TRUE to do the bare ammount of processing on the file.
+ *   Set to TRUE to do the bare amount of processing on the file.
  *
  * @return
  *   On failure a string saying why it failed.
@@ -717,7 +717,7 @@ function advagg_missing_fast404($msg = '') {
 }
 
 /**
- * Read the atime value for the given aggregrate.
+ * Read the atime value for the given aggregate.
  *
  * @param $aggregate_filenames_hash
  *   Hash of the groupings of files.
@@ -817,7 +817,7 @@ function advagg_parse_media_blocks($css) {
     $last_start = $start + 1;
   }
 
-  // Add in any remaing css rules after the last @media statement.
+  // Add in any remaining css rules after the last @media statement.
   if (strlen($css) > $last_start) {
     $insert = trim(substr($css, $last_start));
     if (!empty($insert)) {
