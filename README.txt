@@ -238,6 +238,7 @@ NGINX CONFIGURATION
 -------------------
 
 http://drupal.org/node/1116618
+Note that @drupal might be @rewrite depending on your servers configuration.
 
     ###
     ### advagg_css and advagg_js support
