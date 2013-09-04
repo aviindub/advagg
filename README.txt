@@ -9,6 +9,7 @@ CONTENTS OF THIS FILE
 
  * Features & benefits
  * Configuration
+ * JSMin PHP Extension
  * JavaScript Bookmarklet
  * Technical Details & Hooks
  * nginx Configuration
@@ -167,6 +168,16 @@ settings.php. In general they are settings that should not be changed.
 
     // Value for the compression ratio test.
     $conf['advagg_js_compress_ratio'] = 0.1;
+
+
+JSMIN PHP EXTENSION
+-------------------
+
+The AdvAgg JS Compress module can take advantage of jsmin.c. JavaScript parsing
+and minimizing will be done in C instead of PHP dramatically speeding up the
+process. If using PHP 5.3.10 or higher https://github.com/sqmk/pecl-jsmin is
+recommended. If using PHP 5.3.9 or lower
+http://www.ypass.net/software/php_jsmin/ is recommended.
 
 
 JAVASCRIPT BOOKMARKLET
