@@ -115,7 +115,6 @@ function advagg_missing_send_saved_file($files_to_save, $uri, $created, $type, $
     }
     if (!isset($files_to_save[$uri]) && file_exists($uri) && filesize($uri)) {
       $files_to_save[$uri] = file_get_contents($uri);
-      header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', filemtime($uri)));
     }
   }
 
@@ -126,7 +125,7 @@ function advagg_missing_send_saved_file($files_to_save, $uri, $created, $type, $
   if (ob_get_level()) {
     ob_end_clean();
   }
-  // Set far future headers.
+  // Set generic far future headers.
   advagg_missing_set_farfuture_headers();
   // Return compressed content if we can.
   if ($return_compressed) {
@@ -151,6 +150,10 @@ function advagg_missing_send_saved_file($files_to_save, $uri, $created, $type, $
   if (!empty($data)) {
     // Send out a 200 OK status.
     header($_SERVER['SERVER_PROTOCOL'] . " 200 OK");
+
+    // Insure the Last-Modified header is set so 304's work correctly.
+    header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', filemtime($uri)));
+
     if ($type == 'css') {
       header("Content-Type: text/css");
     }
@@ -635,9 +638,6 @@ function advagg_save_aggregate($filename, $files, $type, $aggregate_settings) {
     advagg_save_data($uri, $data);
     if (!file_exists($uri) || filesize($uri) == 0) {
       watchdog('advagg', 'Write to file system failed. %uri', array('%uri' => $uri), WATCHDOG_EMERGENCY);
-    }
-    else {
-      header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', filemtime($uri)));
     }
   }
   return $files_to_save;
