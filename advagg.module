@@ -231,7 +231,7 @@ function advagg_file_url_alter(&$original_uri) {
   }
 
   // Remove cdn/farfuture/BASE64/prefix:value/ from the URI.
-  $original_uri = preg_replace('/^.*(cdn\/farfuture\/[A-Za-z0-9-_]{43}\/[A-Za-z]+\:[A-Za-z0-9-_]+\/)/', '', $original_uri);
+  $original_uri = preg_replace('/cdn\/farfuture\/[A-Za-z0-9-_]{43}\/[A-Za-z]+\:[A-Za-z0-9-_]+\//', '', $original_uri);
   return;
 }
 
