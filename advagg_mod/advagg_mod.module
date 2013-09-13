@@ -160,13 +160,13 @@ function advagg_mod_js_alter(&$js) {
       if ($move_js_to_footer == 1 && $values['group'] <= JS_LIBRARY) {
         continue;
       }
-      // If JS is not in the header increase group by 1000.
+      // If JS is not in the header increase group by 10000.
       if ($values['scope'] != 'header') {
-        $values['group'] += 1000;
+        $values['group'] += 10000;
       }
-      // If JS is already in the footer increase group by 1000.
+      // If JS is already in the footer increase group by 10000.
       if ($values['scope'] == 'footer') {
-        $values['group'] += 1000;
+        $values['group'] += 10000;
       }
       $values['scope'] = 'footer';
     }

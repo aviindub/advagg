@@ -1110,11 +1110,41 @@ function advagg_get_js($scope = 'header', $javascript = NULL, $skip_alter = FALS
   // without that group. We do not use the $key => $item type of iteration,
   // because PHP uses an internal array pointer for that, and we're modifying
   // the array order inside the loop.
-  foreach (array_keys($items) as $key) {
-    if ($items[$key]['type'] == 'setting') {
-      $item = $items[$key];
-      unset($items[$key]);
-      $items[$key] = $item;
+  if ($scope == 'footer' && module_exists('advagg_mod') && variable_get('advagg_mod_js_footer', ADVAGG_MOD_JS_FOOTER) == 2) {
+    // Get all settings from the items array.
+    $settings_js = array();
+    foreach (array_keys($items) as $key) {
+      if ($items[$key]['type'] == 'setting') {
+        $settings_js[] = $items[$key];
+        unset($items[$key]);
+      }
+    }
+
+    // Add settings array back in right before the footer shift happened.
+    if (!empty($settings_js)) {
+      $counter = 0;
+      foreach ($items as $key => $item) {
+        // Move $settings_js to the bottom of the js that was added to the
+        // header, but has now been moved to the footer via advagg_mod.
+        if ($item['group'] > 9000) {
+          array_splice($items, $counter, 0, $settings_js);
+          unset($settings_js);
+          break;
+        }
+        $counter++;
+      }
+    }
+    if (!empty($settings_js)) {
+      $items = array_merge($items, $settings_js);
+    }
+  }
+  else {
+    foreach (array_keys($items) as $key) {
+      if ($items[$key]['type'] == 'setting') {
+        $item = $items[$key];
+        unset($items[$key]);
+        $items[$key] = $item;
+      }
     }
   }
 
