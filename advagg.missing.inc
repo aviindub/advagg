@@ -152,7 +152,9 @@ function advagg_missing_send_saved_file($files_to_save, $uri, $created, $type, $
     header($_SERVER['SERVER_PROTOCOL'] . " 200 OK");
 
     // Insure the Last-Modified header is set so 304's work correctly.
-    header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', filemtime($uri)));
+    if (file_exists($uri) && $filemtime = @filemtime($uri)) {
+      header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', $filemtime));
+    }
 
     if ($type == 'css') {
       header("Content-Type: text/css");
