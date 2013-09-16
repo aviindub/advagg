@@ -143,7 +143,7 @@ function advagg_missing_send_saved_file($files_to_save, $uri, $created, $type, $
     }
   }
   else {
-    $data = reset($files_to_save);
+    $data = trim(reset($files_to_save));
   }
 
   // Output file and exit.
