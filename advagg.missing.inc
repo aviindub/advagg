@@ -311,7 +311,7 @@ function advagg_htaccess_check_generate($files_to_save, $type, $force = FALSE) {
       continue;
     }
 
-    advagg_save_data($htaccess_file, $data);
+    advagg_save_data($htaccess_file, $data, $force);
   }
 }
 

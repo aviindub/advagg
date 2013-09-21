@@ -255,7 +255,6 @@ function advagg_schema() {
   return $schema;
 }
 
-
 /**
  * Upgrade AdvAgg previous versions (6.x-1.x & 7.x-1.x) to 7.x-2.x.
  *
@@ -300,6 +299,58 @@ function advagg_update_7200(&$sandbox) {
   drupal_install_schema('advagg');
 
   return t('Upgraded Advanced CSS/JS Aggregation to 7.x-2.x.');
+}
+
+/**
+ * Update the .htaccess file in the advagg directories.
+ *
+ * Remove Last-Modified Header.
+ *
+ * Implements hook_update_N().
+ */
+function advagg_update_7201(&$sandbox) {
+  // Get paths to .htaccess file.
+  list($css_path, $js_path) = advagg_get_root_files_dir();
+  $files['css'] = $css_path[0] . '/.htaccess';
+  $files['js'] = $js_path[0] . '/.htaccess';
+
+  // Check for bad .htaccess files.
+  $something_done = FALSE;
+  foreach ($files as $type => $uri) {
+    if (!file_exists($uri)) {
+      unset($files[$type]);
+    }
+    $contents = file_get_contents($uri);
+    // Remove bad .htaccess file.
+    if (strpos($contents, 'Header set Last-Modified') !== FALSE) {
+      drupal_unlink($uri);
+      $something_done = TRUE;
+    }
+  }
+
+  // Create the new .htaccess file.
+  $new_htaccess = FALSE;
+  if (!empty($files) && $something_done && variable_get('advagg_htaccess_check_generate', ADVAGG_HTACCESS_CHECK_GENERATE)) {
+    // Make the advagg_htaccess_check_generate() function available.
+    module_load_include('inc', 'advagg', 'advagg.missing');
+    foreach ($files as $type => $uri) {
+      advagg_htaccess_check_generate(array($uri => $type), $type, TRUE);
+      $new_htaccess = TRUE;
+    }
+  }
+
+  // Output info.
+  if ($something_done) {
+    if ($new_htaccess) {
+      return t('Removed the old .htaccess file and put in a new one.');
+    }
+    else {
+      return t('Removed the old .htaccess file.');
+    }
+  }
+  else {
+    return t('Nothing needed to be done.');
+  }
 }
 
 /**
