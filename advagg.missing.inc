@@ -162,6 +162,7 @@ function advagg_missing_send_saved_file($files_to_save, $uri, $created, $type, $
     elseif ($type == 'js') {
       header("Content-Type: text/javascript; charset=UTF-8");
     }
+    header('X-AdvAgg: Generated file at ' . REQUEST_TIME);
 
     print $data;
     exit();
