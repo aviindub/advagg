@@ -852,7 +852,7 @@ function advagg_install_check_via_http(&$requirements) {
             'title' => $t('Adv CSS/JS Agg - Incorrect readings'),
             'severity' => REQUIREMENT_WARNING,
             'value' => $t('The request for a file was served by Drupal instead of the web server (like Apache).', array('%type' => $type)),
-            'description' => $t('Still working on what to do when this happens. It means that AdvAgg can not test for Far-Future headers internally and you will need to use an external tool in order to do so. Warnings given or not given about AdvAgg Expires, Cache-Control, & If-Modified-Since might be incorrect.'),
+            'description' => $t('It means that AdvAgg can not test for Far-Future headers internally and you will need to use an external tool in order to do so. Warnings given or not given about AdvAgg Expires, Cache-Control, & If-Modified-Since might be incorrect. In the <a href="@readme">readme</a>, under Troubleshooting try the Far-Future recommendations.', array('@readme' => url(drupal_get_path('module', 'advagg') . '/README.txt'))),
           );
         }
 
