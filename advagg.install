@@ -771,6 +771,16 @@ function advagg_install_check_via_http(&$requirements) {
     }
     $urls = array_unique($urls);
     foreach ($urls as $key => $url) {
+      // Make sure the URL contains a schema.
+      if (strpos($url, 'http') !== 0) {
+        if ($GLOBALS['is_https']) {
+          $url = 'https:' . $url;
+        }
+        else {
+          $url = 'http:' . $url;
+        }
+      }
+
       // Set arguments for drupal_http_request().
       $options = array('timeout' => 10, 'headers' => array('Accept-Encoding' => 'gzip, deflate'));
 
