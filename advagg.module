@@ -86,6 +86,11 @@ define('ADVAGG_SHOW_BYPASS_COOKIE_MESSAGE', TRUE);
  */
 define('ADVAGG_URL_INBOUND_ALTER', TRUE);
 
+/**
+ * Allow JavaScript insertion into any scope even if theme does not support it.
+ */
+define('ADVAGG_SCRIPTS_SCOPE_ANYWHERE', FALSE);
+
 // Core hook implementations.
 /**
  * Inbound URL rewrite helper
@@ -985,15 +990,17 @@ function _advagg_process_html(&$variables) {
           $variables['page_bottom'] .= $scripts;
           $js_cache['page_bottom'] = $scripts;
         }
-        // Scripts in other places.
-        elseif (isset($variables[$scope]) && is_string($variables[$scope]) && array_key_exists($scope, $GLOBALS['theme_info']->info['regions'])) {
-          $variables[$scope] .= $scripts;
-          $js_cache[$scope] = $scripts;
-        }
-        // Add javascript to scripts if we can't find the region in the theme.
-        else {
-          $variables['scripts'] .= $scripts;
-          $js_cache['scripts'] .= $scripts;
+        elseif (variable_get('advagg_scripts_scope_anywhere', ADVAGG_SCRIPTS_SCOPE_ANYWHERE)) {
+          // Scripts in other places.
+          elseif (isset($variables[$scope]) && is_string($variables[$scope]) && array_key_exists($scope, $GLOBALS['theme_info']->info['regions'])) {
+            $variables[$scope] .= $scripts;
+            $js_cache[$scope] = $scripts;
+          }
+          // Add javascript to scripts if we can't find the region in the theme.
+          else {
+            $variables['scripts'] .= $scripts;
+            $js_cache['scripts'] .= $scripts;
+          }
         }
       }
 
@@ -1393,6 +1400,7 @@ function advagg_current_hooks_hash_array() {
       'advagg_global_counter' => advagg_get_global_counter(),
       'base_path' => $GLOBALS['base_path'],
       'advagg_ie_css_selector_limiter' => variable_get('advagg_ie_css_selector_limiter', ADVAGG_IE_CSS_SELECTOR_LIMITER),
+      'advagg_scripts_scope_anywhere' => variable_get('advagg_scripts_scope_anywhere', ADVAGG_SCRIPTS_SCOPE_ANYWHERE)
     ),
     'hooks' => advagg_hooks_implemented(FALSE),
   );

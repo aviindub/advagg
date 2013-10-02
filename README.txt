@@ -142,6 +142,10 @@ settings.php. In general they are settings that should not be changed.
     // Run advagg_url_inbound_alter().
     $conf['advagg_url_inbound_alter'] = TRUE;
 
+    // Allow JavaScript insertion into any scope even if theme does not support
+    // it.
+    $conf['advagg_scripts_scope_anywhere'] = FALSE;
+
     // Set the jQuery UI version.
     $conf['advagg_css_cdn_jquery_ui_version'] = '1.8.7';
 
