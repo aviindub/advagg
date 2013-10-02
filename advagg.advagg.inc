@@ -101,7 +101,7 @@ function advagg_advagg_build_aggregate_plans_alter(&$files, &$modified, $type) {
 
 
 /**
- * Implements hook_advagg_context_alter().
+ * Implement hook_advagg_context_alter().
  */
 function advagg_advagg_context_alter(&$original, $aggregate_settings, $mode) {
   if ($mode == 0) {
