@@ -992,7 +992,7 @@ function _advagg_process_html(&$variables) {
         }
         elseif (variable_get('advagg_scripts_scope_anywhere', ADVAGG_SCRIPTS_SCOPE_ANYWHERE)) {
           // Scripts in other places.
-          elseif (isset($variables[$scope]) && is_string($variables[$scope]) && array_key_exists($scope, $GLOBALS['theme_info']->info['regions'])) {
+          if (isset($variables[$scope]) && is_string($variables[$scope]) && array_key_exists($scope, $GLOBALS['theme_info']->info['regions'])) {
             $variables[$scope] .= $scripts;
             $js_cache[$scope] = $scripts;
           }
