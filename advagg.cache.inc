@@ -30,7 +30,6 @@ function advagg_scan_for_changes() {
       // Select the keys to compare.
       $keys_to_compare = array(
         'filesize',
-        'mtime',
         'content_hash',
         'linecount',
       );
@@ -40,6 +39,10 @@ function advagg_scan_for_changes() {
           $changed = TRUE;
           break;
         }
+      }
+      // Compare mtime if it is not zero.
+      if (!$changed && !empty($info['mtime']) && $row['mtime'] != $info['mtime']) {
+        $changed = TRUE;
       }
 
       if (!$changed) {
