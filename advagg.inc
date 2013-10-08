@@ -36,19 +36,21 @@ function advagg_insert_update_db($files, $type, $root) {
       continue;
     }
 
-    // Insert aggregate version information into advagg_aggregates_versions.
-    // If it already exists, skip the rest of the logic in this loop.
-    if (advagg_insert_aggregate_version($values['aggregate_filenames_hash'], $values['aggregate_contents_hash'], $root) == FALSE) {
-      continue;
-    }
-    $write_done = TRUE;
-
     // Insert files into the advagg_files table if it doesn't exist.
     // Update if needed.
-    advagg_insert_update_files($values['files'], $type);
+    if (advagg_insert_update_files($values['files'], $type)) {
+      $write_done = TRUE;
+    }
 
     // Insert aggregate into the advagg_aggregates table if it doesn't exist.
-    advagg_insert_aggregate($values['files'], $values['aggregate_filenames_hash']);
+    if (advagg_insert_aggregate($values['files'], $values['aggregate_filenames_hash'])) {
+      $write_done = TRUE;
+    }
+
+    // Insert aggregate version information into advagg_aggregates_versions.
+    if (advagg_insert_aggregate_version($values['aggregate_filenames_hash'], $values['aggregate_contents_hash'], $root)) {
+      $write_done = TRUE;
+    }
 
     // Release Lock.
     lock_release($lock_name);
