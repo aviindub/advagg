@@ -35,7 +35,8 @@ Advanced CSS/JS Aggregation core features:
  * Url query string to turn off aggregation for that request. ?advagg=0 will
    turn off file aggregation if the user has the "bypass advanced aggregation"
    permission. ?advagg=-1 will completely bypass all of Advanced CSS/JS
-   Aggregations modules and submodules.
+   Aggregations modules and submodules. ?advagg=1 will enable Advanced CSS/JS
+   Aggregation if it is currently disabled.
  * Button on the admin page for dropping a cookie that will turn off file
    aggregation. Useful for theme development.
  * Gzip support. All aggregated files can be pre-compressed into a .gz file and

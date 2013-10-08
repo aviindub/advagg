@@ -1319,15 +1319,14 @@ function advagg_enabled() {
   }
   else {
     // Allow for AdvAgg to be enabled per request.
-    if (   !variable_get('advagg_enabled', ADVAGG_ENABLED)
-        && isset($_GET['advagg'])
+    if (   isset($_GET['advagg'])
         && $_GET['advagg'] == 1
+        && !defined('MAINTENANCE_MODE')
         && user_access('bypass advanced aggregation')
           ) {
-        $GLOBALS['conf']['advagg_enabled'] = TRUE;
-        $GLOBALS['conf']['preprocess_css'] = TRUE;
-        $GLOBALS['conf']['preprocess_js'] = TRUE;
-      }
+      $GLOBALS['conf']['advagg_enabled'] = TRUE;
+      $GLOBALS['conf']['preprocess_css'] = TRUE;
+      $GLOBALS['conf']['preprocess_js'] = TRUE;
     }
 
     // Disable AdvAgg if maintenance mode is defined.
