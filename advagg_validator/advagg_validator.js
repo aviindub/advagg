@@ -8,6 +8,7 @@
  * Have clicks to advagg_validator_js classes run JSHINT on the client.
  */
 (function ($) {
+  "use strict";
   Drupal.behaviors.advagg_validator = {
     attach: function (context, settings) {
       $('.advagg_validator_js', context).click(function (context) {
@@ -27,7 +28,7 @@
             } else {
               $(results).append('<p><h4>' + filename + ' Failed!</h4>');
               $(results).append('<ul>');
-              for (i = 0; i < JSHINT.errors.length; i++) {
+              for (var i = 0; i < JSHINT.errors.length; i++) {
                 $(results).append('<li><b>' + JSHINT.errors[i].line + ':</b> ' + JSHINT.errors[i].reason + '</li>');
               }
               $(results).append('</ul></p>');
