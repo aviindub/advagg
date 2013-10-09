@@ -17,12 +17,15 @@
       $('.advagg_validator_js', context).click(function (context) {
         // Get Results Div.
         var results = $(this).siblings('.results');
+        // Clear out the results.
+        $(results).html('');
         // Loop over each filename.
         $.each($(this).siblings('.filenames'), function() {
           var filename = $(this).val();
           try {
+            var t = new Date().getTime();
             var x = jQuery.ajax({
-              url: settings.basePath + filename,
+              url: settings.basePath + filename + '?t=' + t,
               dataType: 'text',
               async: false
             });
