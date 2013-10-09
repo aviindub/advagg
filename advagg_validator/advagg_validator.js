@@ -1,4 +1,12 @@
 
+/**
+ * @file
+ * Run JSHINT in the browser against the servers JS.
+ */
+
+/**
+ * Have clicks to advagg_validator_js classes run JSHINT on the client.
+ */
 (function ($) {
   Drupal.behaviors.advagg_validator = {
     attach: function (context, settings) {

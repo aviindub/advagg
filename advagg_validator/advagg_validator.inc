@@ -153,24 +153,7 @@ function advagg_validator_test_css_files($files, $options = array()) {
  *   Info from the w3c server.
  */
 function advagg_validator_test_css_file_w3c($filename, &$validator_options = array()) {
-//   // Get public URL for file.
-//   $test_url = file_create_url($filename);
-//   $parse = @parse_url($test_url);
-//
-//   // Get IP Address.
-//   if (ip2long($parse['host']) !== FALSE) {
-//     $ip = $parse['host'];
-//   }
-//   else {
-//     $ip = gethostbyname($parse['host']);
-//   }
-//   // If IP is not externally routable, send raw text instead of uri.
-//   if (ip2long($ip) === FALSE || advagg_validator_reserved_ip($ip)) {
-//     $validator_options['text'] = file_get_contents($filename);
-//   }
-//   else {
-//     $validator_options['uri'] = $test_url;
-//   }
+  // Get CSS files contents.
   $validator_options['text'] = file_get_contents($filename);
 
   // Add in defaults.

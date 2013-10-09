@@ -13,29 +13,6 @@ function advagg_validator_admin_settings_form() {
   $config_path = advagg_admin_config_root_path();
 
   $form = array();
-//   $form['submit_advagg_css'] = array(
-//     '#type' => 'submit',
-//     '#value' => t('Run All root CSS files found in AdvAgg through the jigsaw.w3.org validator'),
-//     '#submit' => array('advagg_validator_admin_test_advagg_css_submit'),
-//     "#ajax" => array(
-//       "callback" => "advagg_validator_admin_test_advagg_css_callback",
-//       "wrapper" => 'advagg-validator-css-validator-ajax',
-//       "effect" => 'fade',
-//     ),
-//   );
-//   $form['submit_all_css'] = array(
-//     '#type' => 'submit',
-//     '#value' => t('Run All CSS files found inside of the drupal webroot through the jigsaw.w3.org validator'),
-//     '#submit' => array('advagg_validator_admin_test_all_css_submit'),
-//     "#ajax" => array(
-//       "callback" => "advagg_validator_admin_test_all_css_callback",
-//       "wrapper" => 'advagg-validator-css-validator-ajax',
-//       "effect" => 'fade',
-//     ),
-//   );
-//   $form["wrapper"] = array(
-//     "#markup" => "<div id='advagg-validator-css-validator-ajax'></div>",
-//   );
   module_load_include('inc', 'advagg_validator', 'advagg_validator');
 
   $form['per_folder_css_checking'] = array(
