@@ -1,3 +1,6 @@
+/* global jQuery:false */
+/* global Drupal:false */
+/* global JSHINT:false */
 
 /**
  * @file
