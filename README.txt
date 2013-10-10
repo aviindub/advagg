@@ -65,7 +65,8 @@ Included submodules:
    * Inline all CSS/JS for given paths.
    * Use a shared directory for a unified multisite.
  * advagg_validator:
-   Validate all root CSS files using jigsaw.w3.org.
+   Validate all CSS files using jigsaw.w3.org. Check all CSS files with CSSLint.
+   Check all JS files with JSHint.
 
 
 CONFIGURATION
