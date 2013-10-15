@@ -314,11 +314,20 @@ function advagg_menu() {
 }
 
 /**
- * Implements hook_cron().
+ * Implement hook_cron().
  *
- * This should be ran about once a day.
+ * This will be ran once a day at most.
+ *
+ * @param bool $bypass_time_check
+ *   Set to TRUE to skip the 24 hour check.
  */
-function advagg_cron() {
+function advagg_cron($bypass_time_check = FALSE) {
+  // Execute once a day (24 hours).
+  if (!$bypass_time_check && variable_get('advagg_cron_timestamp', 0) > (REQUEST_TIME - 86400)) {
+    return array();
+  }
+  variable_set('advagg_cron_timestamp', REQUEST_TIME);
+
   $return = array();
   // Clear out all stale advagg aggregated files.
   module_load_include('inc', 'advagg', 'advagg.cache');
