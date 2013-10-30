@@ -767,6 +767,8 @@ function advagg_get_atime($aggregate_filenames_hash, $aggregate_contents_hash, $
  *
  * @see http://stackoverflow.com/questions/14145620/regular-expression-for-media-queries-in-css
  *
+ * @param string $css
+ *   String of CSS.
  * @return
  *   array of css with only media queries.
  */
@@ -815,10 +817,10 @@ function advagg_parse_media_blocks($css) {
       }
     }
     // Cut @media block out of the css and store.
-    $media_blocks[] = trim(substr($css, $start, ($i + 1) - $start));
+    $media_blocks[] = trim(substr($css, $start, $i - $start));
     // Set the new $start to the end of the block.
     $start = $i;
-    $last_start = $start + 1;
+    $last_start = $start;
   }
 
   // Add in any remaining css rules after the last @media statement.
