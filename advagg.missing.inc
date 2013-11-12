@@ -520,12 +520,16 @@ function advagg_get_css_aggregate_contents($files, $aggregate_settings) {
         }
 
       }
-      // Per the W3C specification at http://www.w3.org/TR/REC-CSS2/cascade.html#at-import,
-      // @import rules must proceed any other style, so we move those to the top.
+      // Per the W3C specification at
+      // http://www.w3.org/TR/REC-CSS2/cascade.html#at-import, @import rules
+      // must proceed any other style, so we move those to the top.
       $regexp = '/@import[^;]+;/i';
       preg_match_all($regexp, $contents, $matches);
       $contents = preg_replace($regexp, '', $contents);
       $import_statements[] = array($last_media, $matches[0]);
+
+      // Close any open comment blocks.
+      $contents .= '/**/';
 
       $data .= $contents;
     }
@@ -575,9 +579,10 @@ function advagg_get_js_aggregate_contents($files, $aggregate_settings) {
     // Build aggregate JS file.
     foreach ($files as $filename => $settings) {
       $contents = '';
-      // Append a ';' and a newline after each JS file to prevent them from running together.
+      // Append a ';' and a newline after each JS file to prevent them from
+      // running together. Also close any comment blocks.
       if (file_exists($filename)) {
-        $contents .= file_get_contents($filename) . ";\n";
+        $contents .= file_get_contents($filename) . ";/**/\n";
       }
       // Allow other modules to modify this files contents.
       // Call hook_advagg_get_js_file_contents_alter().
