@@ -76,6 +76,11 @@ define('ADVAGG_CSS_FIX_TYPE', TRUE);
  */
 define('ADVAGG_HTACCESS_CHECK_GENERATE', TRUE);
 
+/**
+ * Default stream wrapper is the usual 'public'  
+ */
+define('ADVAGG_DEFAULT_STREAM_WRAPPER', 'public');
+
 // Core hook implementations.
 /**
  * Implements hook_hook_info().
@@ -1462,8 +1467,11 @@ function advagg_get_root_files_dir() {
 
   // Make sure directories are available and writable.
   if (empty($css_paths) || empty($js_paths)) {
-    $css_paths[0] = 'public://advagg_css';
-    $js_paths[0] = 'public://advagg_js';
+
+    // use the file stream wrapper specified in settings
+    $wrapper = variable_get('advagg_stream_wrapper', ADVAGG_DEFAULT_STREAM_WRAPPER);
+    $css_paths[0] = "$wrapper://advagg_css";
+    $js_paths[0] = "$wrapper://advagg_js";
 
     file_prepare_directory($css_paths[0], FILE_CREATE_DIRECTORY);
     file_prepare_directory($js_paths[0], FILE_CREATE_DIRECTORY);
