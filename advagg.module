@@ -430,6 +430,7 @@ function advagg_ajax_render_alter(&$commands) {
   }
 
   // Remove core JS.
+  list($styles, $scripts_header, $scripts_footer, $items, $settings) = advagg_build_ajax_js_css();
   foreach ($commands as $key => $values) {
     // Skip if not an array or not a command.
     if (!is_array($values) || empty($values['command'])) {
@@ -465,7 +466,8 @@ function advagg_ajax_render_alter(&$commands) {
   }
 
   // Add in AdvAgg JS.
-  list($styles, $scripts_header, $scripts_footer, $settings) = advagg_build_ajax_js_css();
+  $scripts_footer = advagg_get_js('footer', $items['js'], TRUE);
+  $scripts_header = advagg_get_js('header', $items['js'], TRUE);
   $extra_commands = array();
   if (!empty($scripts_header)) {
     $extra_commands[] = ajax_command_prepend('head', $scripts_header);
@@ -1725,9 +1727,9 @@ function advagg_build_ajax_js_css() {
     unset($items['js']['settings']);
   }
   $styles = drupal_get_css($items['css'], TRUE);
-  $scripts_footer = advagg_get_js('footer', $items['js'], TRUE);
-  $scripts_header = advagg_get_js('header', $items['js'], TRUE);
-  return array($styles, $scripts_header, $scripts_footer, $settings);
+  $scripts_footer = drupal_get_js('footer', $items['js'], TRUE);
+  $scripts_header = drupal_get_js('header', $items['js'], TRUE);
+  return array($styles, $scripts_header, $scripts_footer, $items, $settings);
 }
 
 /**
@@ -1904,7 +1906,7 @@ function advagg_pre_render_scripts($elements) {
     // If a group of files has been aggregated into a single file,
     // $group['data'] contains the URI of the aggregate file. Add a single
     // script element for this file.
-    if ($group['type'] == 'file' && isset($group['data'])) {
+    if (isset($group['type']) && $group['type'] == 'file' && isset($group['data'])) {
       $element = $element_defaults;
       $element['#attributes']['src'] = file_create_url($group['data']);
       $element['#browsers'] = $group['browsers'];
@@ -2066,6 +2068,11 @@ function advagg_group_js($javascript) {
       case 'inline':
         // Do not group external, settings, and inline items.
         $group_keys = FALSE;
+        break;
+
+      default:
+        // Define this here so we dont get undefined alerts down below.
+        $group_keys = NULL;
         break;
     }
 
