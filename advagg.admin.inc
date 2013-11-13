@@ -107,7 +107,12 @@ function advagg_admin_settings_form($form, $form_state) {
     '#default_value' => variable_get('advagg_js_fix_type', ADVAGG_JS_FIX_TYPE),
     '#description' => t('If type is external but does not start with http, https, or // change it to be type file. If type is file but it starts with http, https, or // change type to be external.'),
   );
-
+  $form['global']['advagg_stream_wrapper'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Stream wrapper to use for storing aggregates'),
+    '#default_value' => variable_get('advagg_stream_wrapper', ADVAGG_DEFAULT_STREAM_WRAPPER),
+    '#description' => t('Change this to use a stream wrapper other than the default public wrapper. Use with caution. The value entered here should be just the stream wrapper prefix, without :// (for example, "public")'),
+  );
   // Clear the cache bins on submit.
   $form['#submit'][] = 'advagg_admin_settings_form_submit';
 
