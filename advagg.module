@@ -582,6 +582,8 @@ function advagg_preprocess_html() {
       'content' =>  'IE=edge,chrome=1',
     ),
     '#weight' => '-99999',
+    '#prefix' => '<!--[if IE]>',
+    '#suffix' => '<![endif]-->',
   );
 
   // Add header meta tag for IE to head.
