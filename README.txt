@@ -261,11 +261,12 @@ Note that @drupal might be @rewrite depending on your servers configuration.
     ### advagg_css and advagg_js support
     ###
     location ~* files/advagg_(?:css|js)/ {
-      access_log off;
-      expires    max;
-      add_header ETag "";
-      add_header Cache-Control "max-age=290304000, no-transform, public";
-      try_files  $uri @drupal;
+      gzip_static on;
+      access_log  off;
+      expires     max;
+      add_header  ETag "";
+      add_header  Cache-Control "max-age=290304000, no-transform, public";
+      try_files   $uri @drupal;
     }
 
 
